@@ -7,9 +7,16 @@ import { MenuIcon, XIcon } from '@heroicons/react/solid';
 import { Button } from "@/components/ui/button";
 
 import { UserButton } from "@clerk/nextjs";
+import { useRouter } from 'next/navigation';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
+
+    const router = useRouter();
+
+    const handleSignIn = () => {
+        router.push('/sign-in');
+    };
 
     return (
         <nav className="mx-auto px-4 sm:px-6 lg:px-24">
@@ -41,12 +48,15 @@ const Navbar = () => {
                         <Link href="/blog">
                             <div className="text-[#0c0c0d] hover:bg-[#01b3ef]/80 hover:text-white px-3 py-2 rounded-md text-sm font-medium">blog</div>
                         </Link>
-                        {
-                            <UserButton /> ||
-                            <Button className="w-20 bg-strong text-white px-3 py-2 hover:bg-blue-500/90 hover:text-white/80 rounded-md text-sm font-medium">
-                                Login
-                            </Button>
-                        }
+                        <Button className="w-20 bg-strong text-white px-3 py-2 hover:bg-blue-500/90 hover:text-white/80 rounded-md text-sm font-medium" onClick={handleSignIn}>
+                            Login
+                        </Button>
+
+                        <UserButton
+                            afterSignOutUrl="/"
+                        />
+
+
                     </div>
                 </div>
                 <div className="-mr-2 flex md:hidden">

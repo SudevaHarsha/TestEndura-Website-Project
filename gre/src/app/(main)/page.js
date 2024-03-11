@@ -15,6 +15,7 @@ import InfiniteSlider from "@/components/sections/InfiniteSlider";
 import TestimonialsPage from "@/components/sections/Testimonials";
 import { Button } from "@/components/ui/button";
 import Card from "@/components/sections/Card";
+import { initialProfile } from "@/lib/initial-profile";
 
 export default function Home() {
   const container = useRef(null);
