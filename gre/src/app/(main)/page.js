@@ -3,7 +3,7 @@
 import { useScroll } from "framer-motion";
 import { useEffect, useRef } from "react";
 import Lenis from "@studio-freight/lenis";
-import Card from "@/components/sections/Card";
+
 import { projects } from "@/data/PracticeDtata";
 import ImageTextContainer from "@/components/sections/ImageTextContainer";
 import { SwipeCarousel } from "@/components/sections/SwipeCarousel";
@@ -14,6 +14,7 @@ import GreStudyGuide from "@/components/sections/GreStudyGuide";
 import InfiniteSlider from "@/components/sections/InfiniteSlider";
 import TestimonialsPage from "@/components/sections/Testimonials";
 import { Button } from "@/components/ui/button";
+import Card from "@/components/sections/Card";
 
 export default function Home() {
   const container = useRef(null);
@@ -35,7 +36,7 @@ export default function Home() {
 
   return (
     <div>
-            <SwipeCarousel />
+      <SwipeCarousel />
       <Stats />
       <Success />
       <main ref={container} className="mt-20">

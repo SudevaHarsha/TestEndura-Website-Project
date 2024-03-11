@@ -1,10 +1,12 @@
-import { Open_Sans } from 'next/font/google'
+import { Open_Sans } from "next/font/google";
 import "./globals.css";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-const font = Open_Sans({ subsets: ['latin'] })
+import { ClerkProvider } from "@clerk/nextjs";
+
+const font = Open_Sans({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Create Next App",
@@ -12,9 +14,12 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  console.log(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
   return (
-    <html lang="en">
-      <body className={font.className}>{children}</body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className={font.className}>{children}</body>
+      </html>
+    </ClerkProvider>
   );
 }
