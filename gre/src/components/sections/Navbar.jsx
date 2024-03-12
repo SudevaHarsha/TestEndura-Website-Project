@@ -30,7 +30,7 @@ const Navbar = () => {
                 </div>
                 <div className="hidden md:block h-16">
                     <div className="h-full ml-10 flex items-center justify-center space-x-4 relative">
-                        <Link href="/mocTests">
+                        <Link href="/mock-tests">
                             <div className="text-[#0c0c0d] hover:bg-[#01b3ef]/80 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Mock-Tests</div>
                         </Link>
                         <Link href="/study">
