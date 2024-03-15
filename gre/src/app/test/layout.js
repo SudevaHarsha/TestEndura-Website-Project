@@ -6,7 +6,6 @@ const MainLayout = async ({ children }) => {
     <div className="h-[10%] w-full">
       <Navbar />
       {children}
-      <Footer />
     </div>
   );
 };

@@ -5,6 +5,8 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 import { ClerkProvider } from "@clerk/nextjs";
+import { CurrentQuestionProvider } from "@/providers/CurrentQuestionContext.js";
+import { TimerProvider } from "@/providers/TimerContext";
 
 const font = Open_Sans({ subsets: ["latin"] });
 
@@ -15,11 +17,16 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   console.log(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body className={font.className}>{children}</body>
-      </html>
-    </ClerkProvider>
+    <CurrentQuestionProvider>
+      <TimerProvider>
+        <ClerkProvider>
+          <html lang="en">
+            <body className={font.className}>{children}</body>
+          </html>
+        </ClerkProvider>
+      </TimerProvider>
+    </CurrentQuestionProvider>
   );
 }

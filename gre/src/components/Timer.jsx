@@ -1,15 +1,19 @@
-'use client'
+"use client"
 
 import React, { useState, useEffect } from 'react';
 
-const Timer = ({ duration }) => {
+const TimerClock = ({ TestDuration, onTimeout }) => {
     const [sessionStarted, setSessionStarted] = useState(false);
     const [sessionExpired, setSessionExpired] = useState(false);
     const [minutes, setMinutes] = useState(null);
     const [seconds, setSeconds] = useState(null);
 
+    const date = new Date();
+    date.setHours(19, 45, 0, 0); // Set the time to 11:00 PM
+
     useEffect(() => {
-        const countDownTime = Date.now() + duration * 1000;
+        const countDownTime = date.getTime() + TestDuration * 1000;
+
         const timer = setInterval(() => {
             const now = new Date();
             const distance = countDownTime - now.getTime();
@@ -17,10 +21,10 @@ const Timer = ({ duration }) => {
             const remainingMinutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const remainingSeconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            if (distance < 0) {
+            if (distance <= 0) {
                 clearInterval(timer);
                 setSessionExpired(true);
-                console.log("Countdown ended");
+                onTimeout(); // Call the onTimeout callback
             } else {
                 setSessionStarted(true);
                 setMinutes(remainingMinutes);
@@ -29,13 +33,13 @@ const Timer = ({ duration }) => {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [duration]);
+    }, [TestDuration, onTimeout]);
 
     return (
         <div>
             {sessionStarted && !sessionExpired ? (
                 <div>
-                    <p>Remaining time: {minutes} minutes {seconds} seconds</p>
+                    <p>Remaining time: {minutes} : {seconds}</p>
                 </div>
             ) : sessionExpired ? (
                 <div>
@@ -50,4 +54,4 @@ const Timer = ({ duration }) => {
     );
 };
 
-export default Timer;
+export default TimerClock;

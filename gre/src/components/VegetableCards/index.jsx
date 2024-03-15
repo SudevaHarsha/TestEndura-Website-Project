@@ -20,7 +20,7 @@ const VegetableCards = () => {
   return (
     <div className="container mx-auto py-8 grid grid-cols-3 gap-4">
       {vegetables.map((vegetable, index) => (
-        <TestCard key={index} {...vegetable} />
+        <TestCard key={index} {...vegetable} index={index} />
       ))}
     </div>
   );
