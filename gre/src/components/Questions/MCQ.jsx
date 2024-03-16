@@ -29,7 +29,7 @@ const MCQ = ({question,NextQuestion}) => {
   const questionHasImage = question.image; // Set this to true if the question has an image
   const maxSelections = question.option;
 
-  const {currentQuestion} = useCurrentQuestion();
+  const {currentQuestion,currentSection} = useCurrentQuestion();
 
   console.log(currentQuestion);
 
@@ -95,7 +95,7 @@ const MCQ = ({question,NextQuestion}) => {
               size="lg"
               onClick={NextQuestion}
             >
-              {currentQuestion === 8 ? "Submit" : "Next"} <ChevronRight className="w-4 h-4 ml-2 text-white" />
+              {currentSection==="QuantativeReasoning2" && currentQuestion === 19 ? "Submit" : "Next"} <ChevronRight className="w-4 h-4 ml-2 text-white" />
             </Button>
           </div>
         </div>

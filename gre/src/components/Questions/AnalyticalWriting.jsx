@@ -4,11 +4,14 @@ import React from 'react';
 import { CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from "@/components/ui/textarea"
+import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
 
 const AnalyticalWritingPage = ({NextQuestion}) => {
+  const {setCurrentQuestion} = useCurrentQuestion();
   const handleSubmitEssay = (essay) => {
     // Handle submission logic here
     console.log('Submitted Essay:', essay);
+    setCurrentQuestion(3);
     NextQuestion();
   };
 

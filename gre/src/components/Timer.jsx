@@ -1,15 +1,23 @@
 "use client"
 
+import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 
-const TimerClock = ({ TestDuration, onTimeout }) => {
+const TimerClock = ({ TestDuration }) => {
     const [sessionStarted, setSessionStarted] = useState(false);
     const [sessionExpired, setSessionExpired] = useState(false);
     const [minutes, setMinutes] = useState(null);
     const [seconds, setSeconds] = useState(null);
 
     const date = new Date();
-    date.setHours(19, 45, 0, 0); // Set the time to 11:00 PM
+    date.setHours(23, 37, 0, 0);
+
+    const router = useRouter();
+
+    const onTimeout = ()=>{
+        console.log("end");
+        router.push("/timeout")
+    }
 
     useEffect(() => {
         const countDownTime = date.getTime() + TestDuration * 1000;
@@ -24,7 +32,7 @@ const TimerClock = ({ TestDuration, onTimeout }) => {
             if (distance <= 0) {
                 clearInterval(timer);
                 setSessionExpired(true);
-                onTimeout(); // Call the onTimeout callback
+                onTimeout();
             } else {
                 setSessionStarted(true);
                 setMinutes(remainingMinutes);
@@ -33,7 +41,7 @@ const TimerClock = ({ TestDuration, onTimeout }) => {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [TestDuration, onTimeout]);
+    }, [TestDuration]);
 
     return (
         <div>

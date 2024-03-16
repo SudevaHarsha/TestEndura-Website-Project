@@ -23,7 +23,7 @@ const ReadingCompehension = ({ question, NextQuestion }) => {
         "Test for foreign",
         "test for timepass",
     ];
-    const {currentQuestion} = useCurrentQuestion();
+    const {currentQuestion,currentSection} = useCurrentQuestion();
 
     const [selectedChoices, setSelectedChoices] = useState([]);
     const [selectedSentence, setSelectedSentence] = useState(null);
@@ -81,7 +81,7 @@ const ReadingCompehension = ({ question, NextQuestion }) => {
                             size="lg"
                             onClick={NextQuestion}
                         >
-                             {currentQuestion === 8 ? "Submit" : "Next"} <ChevronRight className="w-4 h-4 ml-2 text-white" />
+                             {currentSection==="QuantativeReasoning2" && currentQuestion === 19 ? "Submit" : "Next"} <ChevronRight className="w-4 h-4 ml-2 text-white" />
                         </Button>
                     </div>
                 </div>

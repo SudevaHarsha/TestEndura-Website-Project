@@ -13,9 +13,11 @@ import { Button } from "@/components/ui/button";
 import { useCurrentQuestion } from "@/providers/CurrentQuestionContext.js";
 import AllQuestions from "@/components/AllQuestions";
 import QuestionsNav from "@/components/Questions/QuestionsNav";
+import SectionWiseQuestions from "@/components/Questions/SectionWiseQuestions";
+import questions from "@/data/Questions";
 
 const TestPage = async ({ testId }) => {
-  const questions = [
+  /* const questions = [
     {
       type: "Multiple Choice",
       option: "1",
@@ -110,7 +112,7 @@ const TestPage = async ({ testId }) => {
       ],
       image:"/i6.gif"
     },
-  ];
+  ]; */
 
   /* const router = useRouter(); */
   /* const { testId } = router.query; */
@@ -149,16 +151,16 @@ const TestPage = async ({ testId }) => {
 
   return (
     <div className="w-full relative flex flex-col justify-center items-center">
-      <QuestionsNav questionLength={questions.length} />
-      {/* <h1>Test 1</h1>
+{/*       <QuestionsNav questionLength={questions.length} />
+ */}      {/* <h1>Test 1</h1>
       <p>An test on Gre</p> */}
       {/* <MCQ /> */}
       {/* <ReadingCompehension /> */}
       {/* <OpenEndedQuestions /> */}
       {/* <QuantitativeQuestions /> */}
       {/* <Timer duration={test.duration} /> */}
-
-      <AllQuestions questions={questions} />
+      
+      <SectionWiseQuestions />
     </div>
   );
 };

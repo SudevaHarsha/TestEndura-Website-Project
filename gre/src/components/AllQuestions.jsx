@@ -8,14 +8,25 @@ import ReadingCompehension from './Questions/ReadingComprehension';
 import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
 import AnalyticalWriting from './Questions/AnalyticalWriting';
 import { useTimer } from '@/providers/TimerContext';
+import { useRouter } from 'next/navigation';
 
 const AllQuestions = ({questions}) => {
 
-    const {currentQuestion,setCurrentQuestion,nextQuestion} = useCurrentQuestion();
+  const router = useRouter();
+
+    const {currentQuestion,setCurrentQuestion,currentSection,setCurrentSection,nextQuestion} = useCurrentQuestion();
     console.log("question",currentQuestion);
+    console.log(questions);
+    
 
     const NextQuestion = () => {
-        currentQuestion < questions.length - 1 ? setCurrentQuestion(currentQuestion + 1) : currentQuestion
+      if(currentSection==="QuantativeReasoning2" && currentQuestion === 19) {
+        setCurrentSection('AnalyticalWriting');
+        setCurrentQuestion(0);
+        router.push("/submission")
+        return
+      }
+        currentQuestion < questions.length - 1 ? setCurrentQuestion(currentQuestion + 1) : router.push("/timepause")
     };
 
   return <>

@@ -26,7 +26,7 @@ const TestCard = ({ name, color, index }) => {
     }; */
 
   return <>
-    <Link href="/mock-tests/insrtructions">
+    <Link href="/insrtructions">
       <div className={`w-72 h-72 rounded-lg p-6 flex flex-col justify-between text-white ${color} shadow-lg mx-4 mb-8 overflow-hidden transition-all duration-300 transform hover:scale-105 hover:translate-y-[-15px] hover:translate-x-[-5px] hover:shadow-2xl hover:shadow-black/60`}>
         <div>
           <h2 className="text-2xl font-bold">{name}</h2>

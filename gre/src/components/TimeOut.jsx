@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
-const Timeout = () => {
+const Timeout = ({handleNextSection}) => {
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col justify-center items-center">
       <div className="max-w-md mx-auto bg-white rounded-lg overflow-hidden">
@@ -22,9 +22,7 @@ const Timeout = () => {
             </CardDescription>
           </Card>
           <div className="mt-6">
-            <Link href="/">
-              <Button variant="primary">Restart Test</Button>
-            </Link>
+              <Button variant="primary" onClick={handleNextSection}>Next Section</Button>
           </div>
         </div>
       </div>

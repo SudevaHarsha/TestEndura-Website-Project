@@ -39,7 +39,7 @@ const QuestionsNav = ({questionLength}) => {
                     </span>
                 </p>
                 <div className="flex self-start mt-3 text-slate-400">
-                    <Timer className="mr-2" onTimeout={onTimeout()} />
+                    <Timer className="mr-2" />
                     <TimerClock TestDuration="30" />
                 </div>
             </div>

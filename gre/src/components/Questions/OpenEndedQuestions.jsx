@@ -38,7 +38,7 @@ const OpenEndedQuestions = ({ question, NextQuestion }) => {
     },
     // Add more blank question data as needed
   ];
-  const { currentQuestion } = useCurrentQuestion();
+  const { currentQuestion,currentSection } = useCurrentQuestion();
 
 
   const [selectedChoices, setSelectedChoices] = useState([]);
@@ -122,7 +122,7 @@ const OpenEndedQuestions = ({ question, NextQuestion }) => {
               size="lg"
               onClick={NextQuestion}
             >
-              {currentQuestion === 8 ? "Submit" : "Next"} <ChevronRight className="w-4 h-4 ml-2 text-white" />
+              {currentSection==="QuantativeReasoning2" && currentQuestion === 19 ? "Submit" : "Next"} <ChevronRight className="w-4 h-4 ml-2 text-white" />
             </Button>
           </div>
         </div>
