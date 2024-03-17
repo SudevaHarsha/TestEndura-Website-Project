@@ -31,7 +31,7 @@ const TestCard = ({ name, color, index }) => {
         <div>
           <h2 className="text-2xl font-bold">{name}</h2>
           <div className="flex items-center mt-2">
-            <span className="bg-black text-white px-2 py-1 rounded-md text-xs">Graded by AI</span>
+            <span className="bg-black text-white px-2 py-1 rounded-md text-xs">Graded by Accuracy</span>
           </div>
         </div>
         <div className="text-center flex justify-end items-center"
@@ -45,14 +45,14 @@ const TestCard = ({ name, color, index }) => {
           {/* <GifPlayer gifUrl="/i4.gif" previewUrl="/i4.png" width={200} height={200} /> */}
           {isHovered ? <Image
             /* src={`/mock-${index}.gif`} */
-            src="/i4.gif"
+            src={`/gre-gif${index+1}.gif`}
             alt="Your GIF"
             width={200}
             height={200}
             style={{ cursor: "pointer" }}
           /> : <Image
             /* src={`/static-mock-${index}.gif`} */
-            src="/i6.gif"
+            src={`/gre${index+1}.gif`}
             width={200}
             height={200}
           />}

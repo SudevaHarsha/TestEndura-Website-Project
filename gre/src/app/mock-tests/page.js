@@ -31,7 +31,7 @@ const page = () => {
       </div>
 
       {/* <SwipeCarousel /> */}
-      <div className="w-[75%] flex mx-auto items-center justify-center gap-14 border-b-2 border-gradient-b">
+      <div className="w-[75%] flex mx-auto items-center justify-center gap-14 border-b-2 border-gradient-b mt-4">
         <Button
           theme="primary"
           className="mr-2 bg-white text-gray-500 font-bold hover:bg-strong/50 hover:text-white hover:font-extrabold"
@@ -51,7 +51,7 @@ const page = () => {
           practice
         </Button>
       </div>
-      <h1 className="text-3xl font-bold ml-16">
+      <h1 className="text-3xl font-bold ml-16 mt-5">
         Mock Tests by <span className="text-strong">MJ Academy</span>
       </h1>
       <VegetableCards />
