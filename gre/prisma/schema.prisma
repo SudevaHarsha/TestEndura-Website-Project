@@ -30,11 +30,13 @@ model Test {
   id          String @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String
-  duration  String
+  overallDuration  String
+
+  sectionDuration  String[]
+  sections  String[]
 
   testSessions TestSession[]
 }
-
 model TestSession {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   profileId String   @db.ObjectId
@@ -42,6 +44,9 @@ model TestSession {
   duration  String
   startTime DateTime
   endTime   DateTime
+  incompleteSection  String @default("AnalyticalWriting")
+  currentSection  String  @default("AnalyticalWriting")
+  currentQuestion  Int  @default(0)
   finished  Boolean  @default(false)
 
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)

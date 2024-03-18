@@ -1,22 +1,40 @@
 "use client"
 
+import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 
-const TimerClock = ({ TestDuration }) => {
+const TimerClock = ({ TestDuration, test, testSession }) => {
     const [sessionStarted, setSessionStarted] = useState(false);
     const [sessionExpired, setSessionExpired] = useState(false);
     const [minutes, setMinutes] = useState(null);
     const [seconds, setSeconds] = useState(null);
+
+    const { currentSection } = useCurrentQuestion();
 
     const date = new Date();
     date.setHours(23, 37, 0, 0);
 
     const router = useRouter();
 
-    const onTimeout = ()=>{
+    const onTimeout = () => {
         console.log("end");
         router.push("/timeout")
+    }
+
+    const sections = test.sectionDuration; // Assuming test.sections is an array of section durations
+    let sectionEndTime = new Date();;
+
+    if (testSession.duration === "") {
+        // Calculate the start time of the current section
+        const sectionStartTime = new Date(testSession?.startTime);
+
+        // Get the duration of the current section
+        const index = test.sections.indexOf(currentSection);
+        const sectionDuration = sections[index];
+
+        // Calculate the end time of the current section
+        sectionEndTime = new Date(sectionStartTime.getTime() + sectionDuration * 60000);
     }
 
     useEffect(() => {
@@ -24,7 +42,7 @@ const TimerClock = ({ TestDuration }) => {
 
         const timer = setInterval(() => {
             const now = new Date();
-            const distance = countDownTime - now.getTime();
+            const distance = sectionEndTime - now.getTime();
 
             const remainingMinutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const remainingSeconds = Math.floor((distance % (1000 * 60)) / 1000);
@@ -61,5 +79,6 @@ const TimerClock = ({ TestDuration }) => {
         </div>
     );
 };
+
 
 export default TimerClock;

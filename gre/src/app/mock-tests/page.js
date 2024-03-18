@@ -6,8 +6,10 @@ import React from "react";
 import Image from 'next/image'
 import Footer from "@/components/Footer";
 import Navbar from "@/components/sections/Navbar";
+import RemainingCards from "@/components/remainingCards";
 
 const page = () => {
+
   return (
     <div>
       <Navbar />
@@ -54,6 +56,7 @@ const page = () => {
       <h1 className="text-3xl font-bold ml-16 mt-5">
         Mock Tests by <span className="text-strong">MJ Academy</span>
       </h1>
+      <RemainingCards />
       <VegetableCards />
       {/* <MockTestCard /> */}
       <Footer />

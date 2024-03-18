@@ -16,6 +16,8 @@ const vegetables = [
 ];
 
 
+
+
 const VegetableCards = () => {
   return (
     <div className="container mx-auto py-8 grid grid-cols-3 gap-4">

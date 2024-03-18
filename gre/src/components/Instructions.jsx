@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/ca
 import { useRouter } from 'next/navigation';
 import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
 import questions from '@/data/Questions';
+import { currentEndTime } from '@/lib/end-time';
 
 const Instructions = () => {
 
@@ -24,7 +25,8 @@ const Instructions = () => {
     setInstructions(instructions+1);
     if(currentSection==="AnalyticalWriting" && currentQuestion===0) {
       console.log("first");
-      router.push("/mock-tests/65efaaa9089eca86da736740");
+/*       currentEndTime();
+ */      router.push("/mock-tests/65efaaa9089eca86da736740");
       return
     }
     const sectionKeys = Object.keys(questions);
@@ -32,7 +34,8 @@ const Instructions = () => {
     if (currentIndex < sectionKeys.length - 1) {
         setCurrentSection(sectionKeys[currentIndex + 1]);
         setCurrentQuestion(0);
-        router.push("/mock-tests/65efaaa9089eca86da736740");
+  /*       currentEndTime();
+ */        router.push("/mock-tests/65efaaa9089eca86da736740");
     } else {
         console.log('Quiz finished');
         setCurrentQuestion(0);

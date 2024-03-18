@@ -119,7 +119,11 @@ const TestPage = async ({ testId }) => {
 
   const profile = await currentProfile();
 
-  /* const test = await db.test.findFirst({
+  if(!profile) {
+    console.log("User does not exists");
+  }
+
+  const test = await db.test.findFirst({
     where: {
       testId: testId
     }
@@ -129,19 +133,26 @@ const TestPage = async ({ testId }) => {
     console.log(test);
   }
 
+  const currentTime = new Date();
+  const endTime = new Date(currentTime.getTime() + test.overallDuration * 60000); // Convert minutes to milliseconds
+
   const testSession = await db.testSession.create({
     data: {
       profileId: profile.id, // Replace with actual user ID
       testId: test.id,
-      duration:'30',
+      duration:'',
       startTime: new Date(),
-      endTime: new Date(Date.now() + test.duration * 60000), // Add test duration in minutes
+      endTime: endTime, // Add test duration in minutes
     },
   });
 
   if(!testSession) {
     console.log("error in test session creation");
-  } */
+  }
+
+/*   const currentTime = new Date();
+ */
+
 
   /* const NextClick = ()=>{
     
@@ -159,8 +170,7 @@ const TestPage = async ({ testId }) => {
       {/* <OpenEndedQuestions /> */}
       {/* <QuantitativeQuestions /> */}
       {/* <Timer duration={test.duration} /> */}
-      
-      <SectionWiseQuestions />
+      <SectionWiseQuestions test={test} testSession={testSession} />
     </div>
   );
 };

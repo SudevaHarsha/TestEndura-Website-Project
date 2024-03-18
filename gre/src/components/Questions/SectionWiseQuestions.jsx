@@ -8,7 +8,7 @@ import QuestionsNav from './QuestionsNav';
 import Timeout from '../TimeOut';
 import { useRouter } from 'next/navigation';
 
-const SectionWiseQuestions = () => {
+const SectionWiseQuestions = ({test,testSession}) => {
 
     const router = useRouter();
 
@@ -31,7 +31,7 @@ const SectionWiseQuestions = () => {
 
     return (
         <>
-            <QuestionsNav questionLength={questions[currentSection].length} />
+            <QuestionsNav questionLength={questions[currentSection].length} testSession={testSession} test={test}/>
             <AllQuestions questions={questions[currentSection]} />
             {/* <Timeout handleNextSection={handleNextSection} /> */}
         </>

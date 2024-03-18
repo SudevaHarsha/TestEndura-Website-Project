@@ -8,8 +8,9 @@ import { Timer } from "lucide-react";
 import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
 import { useTimer } from '@/providers/TimerContext';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
 
-const QuestionsNav = ({questionLength}) => {
+const QuestionsNav = ({questionLength,test,testSession}) => {
 
     const router= useRouter();
 
@@ -28,6 +29,11 @@ const QuestionsNav = ({questionLength}) => {
         currentQuestion != 0 ? setCurrentQuestion(currentQuestion - 1) : currentQuestion
     };
 
+    const handleExit = async () =>{
+        const response = await axios.put(`/api/updateTestDuration/${testSession.id}`);
+        console.log(response);
+    }
+
     return (
         <div className="w-[100%] flex justify-between p-6 pb-0">
             <div className="flex flex-col">
@@ -40,7 +46,7 @@ const QuestionsNav = ({questionLength}) => {
                 </p>
                 <div className="flex self-start mt-3 text-slate-400">
                     <Timer className="mr-2" />
-                    <TimerClock TestDuration="30" />
+                    <TimerClock TestDuration="30" test={test} testSession={testSession} />
                 </div>
             </div>
             <div>
@@ -48,6 +54,9 @@ const QuestionsNav = ({questionLength}) => {
             </div>
             <div className="text center">
                 <Button onClick={PreviousQuestion} className="h-11 text-white bg-strong hover:bg-strong/90 px-3 my-auto text-center"><ChevronLeft className="w-4 h-4 mr-2 text-white" /> previous</Button>
+            </div>
+            <div className="text center">
+                <Button onClick={handleExit} className="h-11 text-white bg-red-600 hover:bg-red-600/90 px-3 my-auto text-center"><ChevronLeft className="w-4 h-4 mr-2 text-white" /> previous</Button>
             </div>
         </div>
     )
