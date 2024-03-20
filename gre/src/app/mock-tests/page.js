@@ -6,7 +6,7 @@ import React from "react";
 import Image from 'next/image'
 import Footer from "@/components/Footer";
 import Navbar from "@/components/sections/Navbar";
-import RemainingCards from "@/components/remainingCards";
+import RemainingCards from "@/components/RemainingCardsCaller";
 
 const page = () => {
 

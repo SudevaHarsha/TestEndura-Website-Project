@@ -42,6 +42,8 @@ const MCQ = ({question,NextQuestion}) => {
     }
   };
 
+  console.log(selectedChoices);
+
 /*   const NextQuestion = () => {
     currentQuestion < 10 - 1 ? currentQuestion + 1 : currentQuestion
 };

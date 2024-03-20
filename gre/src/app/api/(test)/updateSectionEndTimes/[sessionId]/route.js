@@ -3,10 +3,9 @@
 import { db } from "@/lib/db";
 const { NextResponse } = require("next/server");
 
-export async function PUT(req, { params }) {    
+export async function PATCH(req, { params }) {    
     try {
         // Fetch the test session from the database
-        const {currentQuestion,currentSection,finished} = await req.json();
         const testSession = await db.testSession.findUnique({
             where: {
                 id: params.sessionId,
@@ -26,9 +25,6 @@ export async function PUT(req, { params }) {
             },
             data: {
                 sectionEndTimes: sectionEndTimes,
-                currentQuestion:currentQuestion,
-                currentSection:currentSection,
-                finished:finished
             },
         });
 

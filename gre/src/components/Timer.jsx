@@ -1,6 +1,7 @@
 "use client"
 
 import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
+import { useCurrentSession } from '@/providers/CurrentSessionContext';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 
@@ -10,7 +11,12 @@ const TimerClock = ({ TestDuration, test, testSession }) => {
     const [minutes, setMinutes] = useState(null);
     const [seconds, setSeconds] = useState(null);
 
-    const { currentSection } = useCurrentQuestion();
+    const { currentSection, currentQuestion } = useCurrentQuestion();
+    const {currentSession} = useCurrentSession();
+
+/*     const testSession = currentSession;
+
+    console.log(currentSession); */
 
     const date = new Date();
     date.setHours(23, 37, 0, 0);
@@ -22,18 +28,37 @@ const TimerClock = ({ TestDuration, test, testSession }) => {
         router.push("/timeout")
     }
 
-    const sections = test.sectionDuration; // Assuming test.sections is an array of section durations
     let sectionEndTime = new Date();;
 
+    if (testSession.sectionEndTimes && testSession.finished === false && currentQuestion) {
+        const sectionEndTimesLength = testSession.sectionEndTimes.length;
+
+        console.log("resumed");
+
+        if (sectionEndTimesLength > 0) {
+            const sectionEnd = new Date(testSession.sectionEndTimes[sectionEndTimesLength - 1]);
+            const sectionStart = sectionEndTimesLength === 1 ? new Date(testSession.startTime) : new Date(currentSession?.sectionEndTimes[sectionEndTimesLength - 2]);
+
+            const remainingDuration = sectionEnd.getTime() - sectionStart.getTime();
+            const currentDate = new Date();
+
+            sectionEndTime = new Date(currentDate.getTime() + remainingDuration);
+        }
+    }
+
     if (testSession.duration === "") {
+        const sections = test.sectionDuration; // Assuming test.sections is an array of section durations
         // Calculate the start time of the current section
-        const sectionStartTime = new Date(testSession?.startTime);
+        let totalDuration = 0;
+        const sectionStartTime = new Date();
 
         // Get the duration of the current section
         const index = test.sections.indexOf(currentSection);
         const sectionDuration = sections[index];
+        /* sectionEndTime = new Date(sectionDurationString); */
 
         // Calculate the end time of the current section
+
         sectionEndTime = new Date(sectionStartTime.getTime() + sectionDuration * 60000);
     }
 

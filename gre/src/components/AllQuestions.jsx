@@ -9,24 +9,47 @@ import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
 import AnalyticalWriting from './Questions/AnalyticalWriting';
 import { useTimer } from '@/providers/TimerContext';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
+import { useCurrentSession } from '@/providers/CurrentSessionContext';
 
-const AllQuestions = ({questions}) => {
+const AllQuestions = ({questions,testSession}) => {
 
   const router = useRouter();
 
     const {currentQuestion,setCurrentQuestion,currentSection,setCurrentSection,nextQuestion} = useCurrentQuestion();
     console.log("question",currentQuestion);
+    const {currentSession} = useCurrentSession();
     console.log(questions);
     
+    const currentDate = new Date();
+    const handleNext = async() =>{
+      /* const sectionEndTimes = [...testSession.sectionEndTimes,currentDate]
+      const updatedTestSession = await db.testSession.update({
+        where: {
+          id: testSession.id,
+        },
+        data: {
+          sectionEndTimes: sectionEndTimes,
+        },
+      }); */
+      const updatedTestSession = axios.patch(`/api/updateSectionEndTimes/${currentSession.id}`) 
+      console.log(updatedTestSession);
+      router.push(`/timepause/${currentSession.id}`)
+    }
+
+    const handleSubmit = async () => {
+      const submit = await axios.patch(`/api/submit-test/${currentSession.id}`)
+    }
 
     const NextQuestion = () => {
       if(currentSection==="QuantativeReasoning2" && currentQuestion === 19) {
         setCurrentSection('AnalyticalWriting');
         setCurrentQuestion(0);
+        handleSubmit();
         router.push("/submission")
         return
       }
-        currentQuestion < questions.length - 1 ? setCurrentQuestion(currentQuestion + 1) : router.push("/timepause")
+        currentQuestion < questions.length - 1 ? setCurrentQuestion(currentQuestion + 1) : handleNext()
     };
 
   return <>

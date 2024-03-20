@@ -1,9 +1,9 @@
 import Instructions from '@/components/Instructions'
 import React from 'react'
 
-const InstructionsPage = () => {
+const InstructionsPage = ({sessionId}) => {
   return (
-    <Instructions />
+    <Instructions sessionId={sessionId} />
   )
 }
 

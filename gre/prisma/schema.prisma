@@ -27,31 +27,64 @@ model Profile {
 }
 
 model Test {
-  id          String @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String
-  overallDuration  String
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  description     String
+  overallDuration String
 
-  sectionDuration  String[]
-  sections  String[]
+  sectionDuration String[]
+  sections        String[]
 
   testSessions TestSession[]
+  Questions    Question[]
 }
+
 model TestSession {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  profileId String   @db.ObjectId
-  testId    String   @db.ObjectId
-  duration  String
-  startTime DateTime
-  endTime   DateTime
-  incompleteSection  String @default("AnalyticalWriting")
-  currentSection  String  @default("AnalyticalWriting")
-  currentQuestion  Int  @default(0)
-  finished  Boolean  @default(false)
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  profileId         String   @db.ObjectId
+  testId            String   @db.ObjectId
+  duration          String
+  startTime         DateTime
+  endTime           DateTime
+  sectionEndTimes   String[]
+  incompleteSection String   @default("AnalyticalWriting")
+  currentSection    String   @default("AnalyticalWriting")
+  currentQuestion   Int      @default(0)
+  finished          Boolean  @default(false)
+
+  sessionAnswers String[]
 
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   test    Test    @relation(fields: [testId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model QuestionType {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  type String
+
+  questions Question[]
+}
+
+model Question {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  typeId        String   @db.ObjectId
+  testId        String   @db.ObjectId
+  questionText  String
+  options       String[]
+  correctAnswer String
+  section       String
+
+  highlighted    Boolean?
+  blankType      String?
+  select         Boolean?
+  image          Boolean?
+  option         Int?
+  numberOfBlanks Int?
+  blankOptions  String[]
+
+  test         Test         @relation(fields: [testId], references: [id], onDelete: Cascade)
+  questionType QuestionType @relation(fields: [typeId], references: [id], onDelete: Cascade)
 }

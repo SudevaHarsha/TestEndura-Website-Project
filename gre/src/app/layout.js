@@ -7,6 +7,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { CurrentQuestionProvider } from "@/providers/CurrentQuestionContext.js";
 import { TimerProvider } from "@/providers/TimerContext";
+import { CurrentSessionProvider } from "@/providers/CurrentSessionContext";
 
 const font = Open_Sans({ subsets: ["latin"] });
 
@@ -20,13 +21,15 @@ export default function RootLayout({ children }) {
 
   return (
     <CurrentQuestionProvider>
-      <TimerProvider>
-        <ClerkProvider>
-          <html lang="en">
-            <body className={font.className}>{children}</body>
-          </html>
-        </ClerkProvider>
-      </TimerProvider>
+      <CurrentSessionProvider>
+        <TimerProvider>
+          <ClerkProvider>
+            <html lang="en">
+              <body className={font.className}>{children}</body>
+            </html>
+          </ClerkProvider>
+        </TimerProvider>
+      </CurrentSessionProvider>
     </CurrentQuestionProvider>
   );
 }

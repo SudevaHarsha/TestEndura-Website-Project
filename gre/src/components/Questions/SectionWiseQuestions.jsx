@@ -7,15 +7,19 @@ import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
 import QuestionsNav from './QuestionsNav';
 import Timeout from '../TimeOut';
 import { useRouter } from 'next/navigation';
+import { useCurrentSession } from '@/providers/CurrentSessionContext';
+import axios from 'axios';
 
 const SectionWiseQuestions = ({test,testSession}) => {
 
     const router = useRouter();
 
+    const {currentSession,setCurrentSession} = useCurrentSession();
     const { currentQuestion, setCurrentQuestion, currentSection, setCurrentSection, nextQuestion } = useCurrentQuestion();
     console.log("question", currentQuestion);
 
-   /*  const cquestions = questions[currentSection];
+/*     setCurrentSession(testSession);
+ */   /*  const cquestions = questions[currentSection];
     console.log(cquestions); */
 /*     const handleNextSection = () => {
         const sectionKeys = Object.keys(questions);
@@ -29,10 +33,15 @@ const SectionWiseQuestions = ({test,testSession}) => {
         }
     }; */
 
+    /* useEffect(()=>{
+        const fetchedQuestions = axios.post("/api/divide-questions",{testId:test.id})
+        console.log(fetchedQuestions);
+    },[]) */
+
     return (
         <>
             <QuestionsNav questionLength={questions[currentSection].length} testSession={testSession} test={test}/>
-            <AllQuestions questions={questions[currentSection]} />
+            <AllQuestions questions={questions[currentSection]} testSession={testSession}/>
             {/* <Timeout handleNextSection={handleNextSection} /> */}
         </>
     );

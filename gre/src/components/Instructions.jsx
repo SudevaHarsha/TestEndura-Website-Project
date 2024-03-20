@@ -8,49 +8,59 @@ import { useRouter } from 'next/navigation';
 import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
 import questions from '@/data/Questions';
 import { currentEndTime } from '@/lib/end-time';
+import { useCurrentSession } from '@/providers/CurrentSessionContext';
 
-const Instructions = () => {
+const Instructions = ({sessionId}) => {
 
-  const {instructions,setInstructions,setCurrentQuestion,currentSection,setCurrentSection,currentQuestion} = useCurrentQuestion();
+  const { instructions, setInstructions, setCurrentQuestion, currentSection, setCurrentSection, currentQuestion } = useCurrentQuestion();
+  const { currentSession,setCurrentSession } = useCurrentSession();
+
+  console.log(sessionId);
 
   const router = useRouter();
 
-  const handleClick = () =>{
+  const handleClick = () => {
     console.log("instructionsclicked");
-    if(instructions===0){
-      setInstructions(instructions+1);
-      router.push("/insrtructions");
+    if (instructions === 0) {
+      setInstructions(instructions + 1);
+      router.push(`/insrtructions/${currentSession.id}`);
       return
     }
-    setInstructions(instructions+1);
-    if(currentSection==="AnalyticalWriting" && currentQuestion===0) {
+    setInstructions(instructions + 1);
+    if (currentSection === "AnalyticalWriting" && currentQuestion === 0 /* && currentSession.currentQuestion === 0 */) {
       console.log("first");
-/*       currentEndTime();
- */      router.push("/mock-tests/65efaaa9089eca86da736740");
+      router.push(`/mock-tests/${currentSession.id}`);
       return
-    }
+    } /* else {
+      router.push(`/mock-tests/resume-test/${currentSession.id}`)
+    } */
     const sectionKeys = Object.keys(questions);
     const currentIndex = sectionKeys.indexOf(currentSection);
     if (currentIndex < sectionKeys.length - 1) {
-        setCurrentSection(sectionKeys[currentIndex + 1]);
-        setCurrentQuestion(0);
-  /*       currentEndTime();
- */        router.push("/mock-tests/65efaaa9089eca86da736740");
+      setCurrentSection(sectionKeys[currentIndex + 1]);
+      setCurrentQuestion(0);
+      /*       currentEndTime();
+     */
+      if (currentSession.currentQuestion === 0) {
+        router.push(`/mock-tests/${currentSession.id}`);
+      } else {
+        router.push(`/mock-tests/resume-test/${currentSession.id}`)
+      }
     } else {
-        console.log('Quiz finished');
-        setCurrentQuestion(0);
-        setCurrentSection("AnalyticalWriting");
-        router.push("/mock-tests")
-        // You can handle quiz completion here
+      console.log('Quiz finished');
+      setCurrentQuestion(0);
+      setCurrentSection("AnalyticalWriting");
+      router.push("/mock-tests")
+      // You can handle quiz completion here
     }
   }
 
   const stmt = instructions === 0 ? "GRE MOCK TEST" :
-  instructions === 1 ? "ANALYTICAL WRITING" :
-  instructions === 2 ? "VERBAL REASONING-1" :
-  instructions === 3 ? "VERBAL REASONING 2" :
-  instructions === 4 ? "QUANTITATIVE ANALYSIS 1" :
-  instructions === 5 ? "QUANTITATIVE ANALYSIS 2" : "";
+    instructions === 1 ? "ANALYTICAL WRITING" :
+      instructions === 2 ? "VERBAL REASONING-1" :
+        instructions === 3 ? "VERBAL REASONING 2" :
+          instructions === 4 ? "QUANTITATIVE ANALYSIS 1" :
+            instructions === 5 ? "QUANTITATIVE ANALYSIS 2" : "";
 
   console.log(stmt);
 
@@ -101,7 +111,7 @@ const Instructions = () => {
       </div>
 
       <div className="mt-8">
-          <Button onClick={handleClick} variant="primary" className="bg-strong text-white hover:bg-strong/80">Start Test</Button>
+        <Button onClick={handleClick} variant="primary" className="bg-strong text-white hover:bg-strong/80">Start Test</Button>
       </div>
     </div>
   );

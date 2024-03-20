@@ -1,0 +1,56 @@
+import Instructions from "@/components/Instructions";
+import Intermediete from "@/components/Intermediete";
+import { currentProfile } from "@/lib/current-profile";
+import { db } from "@/lib/db";
+import { redirect } from "next/dist/server/api-utils";
+import { useRouter } from "next/navigation";
+import React from "react";
+
+const page = async ({ testId }) => {
+  const profile = await currentProfile();
+
+  /* const router = useRouter(); */
+
+  if (!profile) {
+    console.log("User does not exists");
+  }
+
+  const test = await db.test.findFirst({
+    where: {
+      testId: testId,
+    },
+  });
+  console.log(test);
+
+  if (!test) {
+    return redirect("/mock-tests");
+  }
+
+  const currentTime = new Date();
+  const endTime = new Date(
+    currentTime.getTime() + test.overallDuration * 60000
+  );
+
+  const testSession = await db.testSession.create({
+    data: {
+      profileId: profile.id, // Replace with actual user ID
+      testId: test.id,
+      duration: "",
+      startTime: new Date(),
+      endTime: endTime,
+      sectionEndTimes: [], // Add test duration in minutes
+      sessionAnswers: []
+    },
+  });
+
+  console.log(testSession.id);
+
+  if (!testSession) {
+    console.log("error in test session creation");
+    redirect("/mock-tests");
+  }
+
+  return <Intermediete testSession={testSession} />;
+};
+
+export default page;

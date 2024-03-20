@@ -1,28 +1,31 @@
-import { db } from '@/lib/db';
+"use client"
+
+import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
+import { useCurrentSession } from '@/providers/CurrentSessionContext';
+import { useRouter } from 'next/navigation'
 import React from 'react'
 
-const RemainingCards = async() => {
-    const filteredSessions = await db.testSession.findMany({
-        where: {
-          NOT: {
-            duration: ''
-          }
-        }
-      });
-      
-      const testSessions = filteredSessions.filter(session => {
-        // Convert duration and endTime to appropriate types if necessary
-        const duration = new Date(session.duration);
-        const endTime = new Date(session.endTime);
-      
-        // Compare the duration with endTime
-        return duration < endTime;
-      });
-      
-        console.log(testSessions);
-  return (
-    <div>{JSON.stringify(testSessions)}</div>
-  )
+
+
+const RemainingCards = ({filteredSessions}) => {
+
+  const router = useRouter();
+  const {currentSession,setCurrentSession} = useCurrentSession();
+  const {setCurrentQuestion,setCurrentSection} = useCurrentQuestion();
+
+  const handleResumeClick = (index) =>{
+    setCurrentSession(filteredSessions[index]);
+    setCurrentQuestion(filteredSessions[index].currentQuestion)
+    setCurrentSection(filteredSessions[index].currentSection)
+    router.push(`/mock-tests/resume-test/${filteredSessions[index].id}`)
+  }
+    return (
+        <div>{
+            filteredSessions.map((sessionRemained,index) => {
+              return <div key={index} onClick={()=>handleResumeClick(index)}>{JSON.stringify(sessionRemained)}</div>
+            })
+          }</div>
+      )
 }
 
 export default RemainingCards
