@@ -1,24 +1,27 @@
 "use client"
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useCurrentSession } from './CurrentSessionContext';
 
 const CurrentQuestionContext = createContext();
 
 export const CurrentQuestionProvider = ({ children }) => {
+
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [currentSection, setCurrentSection] = useState('AnalyticalWriting');
+  const [currentSection, setCurrentSection] = useState('VerbalReasoning1');
   const [instructions,setInstructions] = useState(0);
   const [endTime,setEndTimeState] = useState(null);
+  const [selectedChoices, setSelectedChoices] = useState([]);
 
   // Load the currentQuestion state from local storage, default to 0 if not available
-  useEffect(() => {
+/*   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedEndTime = window.localStorage.getItem('endTime');
       if (storedEndTime) {
         setEndTimeState(JSON.parse(storedEndTime));
       }
     }
-  }, []);
+  }, []); */
 
   // Update the endTime state and store it in local storage
   const setEndTime = (question) => {
@@ -42,14 +45,15 @@ export const CurrentQuestionProvider = ({ children }) => {
     currentSection,
     setCurrentSection,
     instructions,setInstructions,
-    endTime,setEndTime
+    endTime,setEndTime,
+    selectedChoices, setSelectedChoices
   };
 
   return <CurrentQuestionContext.Provider value={value}>{children}</CurrentQuestionContext.Provider>;
 };
 
 export const useCurrentQuestion = () => {
-  const {currentQuestion,setCurrentQuestion,currentSection,setCurrentSection,instructions,setInstructions,endTime,setEndTime} = useContext(CurrentQuestionContext);
+  const {currentQuestion,setCurrentQuestion,currentSection,setCurrentSection,instructions,setInstructions,endTime,setEndTime,selectedChoices, setSelectedChoices} = useContext(CurrentQuestionContext);
 
-  return {currentQuestion,setCurrentQuestion,currentSection,setCurrentSection,instructions,setInstructions,endTime,setEndTime}
+  return {currentQuestion,setCurrentQuestion,currentSection,setCurrentSection,instructions,setInstructions,endTime,setEndTime,selectedChoices, setSelectedChoices}
 };

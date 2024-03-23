@@ -173,10 +173,38 @@ const TestPage = async ({ sessionId }) => {
 
   const testSession = await db.testSession.findFirst({
     where: {
-      testId: sessionId,
+      id: sessionId,
     },
     include: {
-      test: true,
+      test: {
+        include: {
+          Questions: {
+            include: {
+              questionType: true,
+            }
+          },
+          quantitativeQuestions: {
+            include: {
+              questionType: true,
+            }
+          },
+          readingComprehensionQuestions: {
+            include: {
+              questionType: true,
+            }
+          },
+          multipleAnswerQuestions: {
+            include: {
+              questionType: true,
+            }
+          },
+          multipleChoiceQuestions: {
+            include: {
+              questionType: true,
+            }
+          },
+        },
+      },
     },
   });
 
@@ -200,9 +228,16 @@ const TestPage = async ({ sessionId }) => {
 
   const testId = testSession.test.testId;
 
-  const questions = await db.question.findMany({
+/*   const questions = await db.question.findMany({
     where: { testId },
-  });
+    include:{
+      questionType: true
+    }
+  }); */
+
+/*   console.log(testSession.test) */
+
+  const questions = [...testSession.test.Questions,...testSession.test.quantitativeQuestions,...testSession.test.readingComprehensionQuestions,...testSession.test.multipleAnswerQuestions,...testSession.test.multipleChoiceQuestions];
 
   const sections = testSession.test.sections.reduce((acc, section) => {
     const sectionQuestions = questions.filter(
@@ -225,7 +260,7 @@ const TestPage = async ({ sessionId }) => {
       {/* <OpenEndedQuestions /> */}
       {/* <QuantitativeQuestions /> */}
       {/* <Timer duration={test.duration} /> */}
-      <SectionWiseQuestions test={testSession.test} testSession={testSession} />
+      <SectionWiseQuestions test={testSession.test} testSession={testSession} questions={sections} />
     </div>
   );
 };

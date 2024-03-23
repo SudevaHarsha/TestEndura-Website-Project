@@ -17,6 +17,9 @@ import Options from "./Options";
 import { useCurrentQuestion } from "@/providers/CurrentQuestionContext";
 
 const OpenEndedQuestions = ({ question, NextQuestion }) => {
+  const blanksNumber = Array(5).fill(question.numberOfBlanks);
+  console.log(blanksNumber);
+
   const blanksData = [
     {
       id: 1,
@@ -73,7 +76,7 @@ const OpenEndedQuestions = ({ question, NextQuestion }) => {
                 <div className="text-base text-slate-400">10</div>
               </CardTitle>
               <CardDescription className="flex-grow text-lg">
-                {currentBlank.sentence}
+                {currentBlank.questionText}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -83,7 +86,7 @@ const OpenEndedQuestions = ({ question, NextQuestion }) => {
               currentBlank.blanks.map((blank, index) => (
                 <input
                   key={index}
-                  type="text"
+                  type="number"
                   placeholder={`Enter ${blank}`}
                   value={selectedChoices[index] || ""}
                   onChange={(e) => {
@@ -114,7 +117,9 @@ const OpenEndedQuestions = ({ question, NextQuestion }) => {
               />
             ) : (
               // Render multiple-choice options
-              <Options question={question} selectmode={false} />
+              blanksNumber.map(()=>(
+                <Options question={question} selectmode={false} blankOptions={question.blankOptions} />
+              ))
             )}
             <Button
               variant="default"

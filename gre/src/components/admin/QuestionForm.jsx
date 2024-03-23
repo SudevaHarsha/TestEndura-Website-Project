@@ -10,15 +10,20 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
     questionText: '',
     numberOfOptions: 0,
     options: [],
-    correctAnswer: '',
+    correctAnswer: [],
     description: '',
     highlighted: false,
     blankType: '',
     select: false,
     image: false,
     section: '',
-    numberOfBlanks: 1, // New state for number of blanks
-    blankOptions: ['']
+    numberOfBlanks: 0, // New state for number of blanks
+    blankOptions: [''],
+    paragraph: '',
+    highlightedSentence: '',
+    correctSentence : '',
+    Quantity1: '',
+    Quantity2: ''
   });
 
   /*   const [questionTypes, setQuestionTypes] = useState([]);
@@ -84,17 +89,42 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
         Blank {index + 1} Options:
         <div className="flex flex-col">
           {Array.from({ length: 3 }).map((_, optionIndex) => (
-            <input
-              key={optionIndex}
-              type="text"
-              value={formData.blankOptions[index * 3 + optionIndex] || ''}
-              onChange={(e) => handleBlankOptionChange(e, index * 3 + optionIndex)}
-              className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-            />
+            <div key={index} className="mb-4">
+              <input
+                key={optionIndex}
+                type="text"
+                value={formData.blankOptions[index * 3 + optionIndex] || ''}
+                onChange={(e) => handleBlankOptionChange(e, index * 3 + optionIndex)}
+                className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              />
+              <label className="block mt-2">
+                <input
+                  type="checkbox"
+                  name={`correctOptions[${optionIndex}]`}
+                  checked={formData.correctAnswer.includes(optionIndex)}
+                  onChange={(e) => handleCorrectOptionChange(e, optionIndex)}
+                  className="mr-2"
+                />
+                Correct Option
+              </label>
+            </div>
           ))}
         </div>
       </div>
     ));
+  };
+
+  const handleCorrectOptionChange = (e, index) => {
+    const { checked } = e.target;
+    setFormData((prevFormData) => {
+      const updatedcorrectAnswer = checked
+        ? [...prevFormData.correctAnswer, index]
+        : prevFormData.correctAnswer.filter((optionIndex) => optionIndex !== index);
+      return {
+        ...prevFormData,
+        correctAnswer: updatedcorrectAnswer,
+      };
+    });
   };
 
   const handleCreateQuestion = async () => {
@@ -110,15 +140,20 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
         questionText: '',
         numberOfOptions: 0,
         options: [],
-        correctAnswer: '',
+        correctAnswer: [],
         description: '',
         highlighted: false,
         blankType: '',
         select: false,
         image: false,
         section: '',
-        numberOfBlanks: 1, // New state for number of blanks
-        blankOptions: ['']
+        numberOfBlanks: 0, // New state for number of blanks
+        blankOptions: [''],
+        paragraph: '',
+        highlightedSentence: '',
+        correctSentence : '',
+        Quantity2: '',
+        Quantity1: ''
       });
     } catch (error) {
       console.error('Error creating question:', error);
@@ -179,6 +214,18 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
               ))}
         </select>
       </label>
+
+      {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'Reading Comprehension' && (
+        <label className="block mb-4">
+          Paragraph:
+          <textarea
+            name="paragraph"
+            value={formData.paragraph}
+            onChange={handleChange}
+            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </label>
+      )}
       <label className="block mb-4">
         Question Text:
         <input
@@ -220,7 +267,7 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
           {renderBlankOptionsInputs()}
         </>
       )}
-      {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type != 'Blank' && <label className="block mb-4">
+      {!formData.select && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type != 'Blank' && <label className="block mb-4">
         Number of Options:
         <input
           type="number"
@@ -230,7 +277,17 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
           className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
         />
       </label>}
-      {Array.from({ length: formData.numberOfOptions }).map((_, index) => (
+      {formData.select && <label className="block mb-4">
+        Correct Answer:
+        <input
+          type="text"
+          name="correctSentence"
+          value={formData.correctSentence}
+          onChange={handleChange}
+          className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+        />
+      </label>}
+      {/* {Array.from({ length: formData.numberOfOptions }).map((_, index) => (
         <div key={index} className="mb-4">
           Option {index + 1}:
           <input
@@ -240,7 +297,29 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
             className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
+      ))} */}
+      {!formData.select && Array.from({ length: formData.numberOfOptions }).map((_, index) => (
+        <div key={index} className="mb-4">
+          Option {index + 1}:
+          <input
+            type="text"
+            value={formData.options[index] || ''}
+            onChange={(e) => handleOptionChange(e, index)}
+            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          />
+          <label className="block mt-2">
+            <input
+              type="checkbox"
+              name={`correctOptions[${index}]`}
+              checked={formData.correctAnswer.includes(index)}
+              onChange={(e) => handleCorrectOptionChange(e, index)}
+              className="mr-2"
+            />
+            Correct Option
+          </label>
+        </div>
       ))}
+
       {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'Reading Comprehension' && (
         <>
           <div className="mb-4">
@@ -273,6 +352,18 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
           </div>
         </>
       )}
+      {formData.highlighted && (
+        <label className="block mb-4">
+          Sentence to Highlight:
+          <input
+            type="text"
+            name="highlightedSentence"
+            value={formData.highlightedSentence}
+            onChange={handleChange}
+            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </label>
+      )}
       {(questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'MCQ' || questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'Quantitative') && (
         <div className="mb-4">
           <label className="block mb-2 font-bold">Image:</label>
@@ -284,7 +375,31 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
           />
         </div>
       )}
-      <label className="block mb-4">
+      {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'Quantitative' && (
+        <>
+          <label className="block mb-4">
+            Quantity 1:
+            <input
+              type="text"
+              name="Quantity1"
+              value={formData.Quantity1}
+              onChange={handleChange}
+              className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </label>
+          <label className="block mb-4">
+            Quantity 2:
+            <input
+              type="text"
+              name="Quantity2"
+              value={formData.Quantity2}
+              onChange={handleChange}
+              className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </label>
+        </>
+      )}
+      {/* <label className="block mb-4">
         Correct Option:
         <input
           type="text"
@@ -293,7 +408,7 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
           onChange={handleChange}
           className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
         />
-      </label>
+      </label> */}
       <label className="block mb-4">
         Description:
         <textarea

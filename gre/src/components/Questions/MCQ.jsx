@@ -85,7 +85,7 @@ const MCQ = ({question,NextQuestion}) => {
                 <div className="text-base text-slate-400">10</div>
               </CardTitle>
               <CardDescription className="flex-grow text-lg">
-                {question.question}
+                {question.questionText}
               </CardDescription>
             </CardHeader>
           </Card>

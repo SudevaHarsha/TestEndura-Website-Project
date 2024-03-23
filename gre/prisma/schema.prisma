@@ -35,8 +35,12 @@ model Test {
   sectionDuration String[]
   sections        String[]
 
-  testSessions TestSession[]
-  Questions    Question[]
+  testSessions                  TestSession[]
+  Questions                     Question[]
+  multipleChoiceQuestions       MultipleChoiceQuestion[]
+  multipleAnswerQuestions       MultipleAnswerQuestion[]
+  readingComprehensionQuestions ReadingComprehensionQuestion[]
+  quantitativeQuestions         QuantitativeQuestion[]
 }
 
 model TestSession {
@@ -52,7 +56,7 @@ model TestSession {
   currentQuestion   Int      @default(0)
   finished          Boolean  @default(false)
 
-  sessionAnswers String[]
+  sessionAnswers Json
 
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   test    Test    @relation(fields: [testId], references: [id], onDelete: Cascade)
@@ -65,7 +69,82 @@ model QuestionType {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   type String
 
-  questions Question[]
+  questions                     Question[]
+  multipleChoiceQuestions       MultipleChoiceQuestion[]
+  multipleAnswerQuestions       MultipleAnswerQuestion[]
+  readingComprehensionQuestions ReadingComprehensionQuestion[]
+  quantitativeQuestions         QuantitativeQuestion[]
+}
+
+model ReadingComprehensionQuestion {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  typeId        String   @db.ObjectId
+  testId        String   @db.ObjectId
+  correctAnswer Int[]
+  correctSentence  String[]
+  questionText  String
+  options       String[]
+  section       String
+  paragraph     String
+
+  highlighted         Boolean?
+  select              Boolean?
+  highlightedSentence String?
+  option              Int?
+
+  test         Test         @relation(fields: [testId], references: [id], onDelete: Cascade)
+  questionType QuestionType @relation(fields: [typeId], references: [id], onDelete: Cascade)
+}
+
+model MultipleAnswerQuestion {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  typeId        String   @db.ObjectId
+  testId        String   @db.ObjectId
+  correctAnswer Int[]
+  questionText  String
+  options       String[]
+  section       String
+
+  blankType      String?
+  numberOfBlanks Int?
+  blankOptions   String[]
+  option         Int?
+
+  test         Test         @relation(fields: [testId], references: [id], onDelete: Cascade)
+  questionType QuestionType @relation(fields: [typeId], references: [id], onDelete: Cascade)
+}
+
+model MultipleChoiceQuestion {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  typeId        String   @db.ObjectId
+  testId        String   @db.ObjectId
+  correctAnswer Int[]
+  questionText  String
+  options       String[]
+  section       String
+
+  image  Boolean?
+  option Int?
+
+  test         Test         @relation(fields: [testId], references: [id], onDelete: Cascade)
+  questionType QuestionType @relation(fields: [typeId], references: [id], onDelete: Cascade)
+}
+
+model QuantitativeQuestion {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  typeId        String   @db.ObjectId
+  testId        String   @db.ObjectId
+  correctAnswer Int[]
+  questionText  String
+  options       String[]
+  section       String
+
+  Quantity1 String
+  Quantity2 String
+  option    Int?
+
+  test         Test         @relation(fields: [testId], references: [id], onDelete: Cascade)
+  questionType QuestionType @relation(fields: [typeId], references: [id], onDelete: Cascade)
 }
 
 model Question {
@@ -74,16 +153,18 @@ model Question {
   testId        String   @db.ObjectId
   questionText  String
   options       String[]
-  correctAnswer String
+  correctAnswer Int[]
   section       String
+  paragraph     String
 
-  highlighted    Boolean?
-  blankType      String?
-  select         Boolean?
-  image          Boolean?
-  option         Int?
-  numberOfBlanks Int?
-  blankOptions  String[]
+  highlighted         Boolean?
+  blankType           String?
+  select              Boolean?
+  image               Boolean?
+  option              Int?
+  numberOfBlanks      Int?
+  blankOptions        String[]
+  highlightedSentence String?
 
   test         Test         @relation(fields: [testId], references: [id], onDelete: Cascade)
   questionType QuestionType @relation(fields: [typeId], references: [id], onDelete: Cascade)

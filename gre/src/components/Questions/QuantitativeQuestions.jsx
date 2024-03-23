@@ -53,14 +53,14 @@ const QuantitativeQuestions = ({ question, NextQuestion }) => {
           <Card className="w-full mt-4 rounded-2xl">
             <CardHeader className="flex flex-row items-center">
               <CardHeader className="flex-grow text-lg">
-                {question.question}
+                {question.questionText}
                 <div className="flex flex-row justify-center gap-4">
                   <div
                     className={`w-[50%] flex flex-col justify-center items-center text-center border-r-2 pr-1}`
                     }
                   >
                     <div className="font-semibold">Quantity-1:</div>
-                    <div className="pt-2">{question.quantityA}</div>
+                    <div className="pt-2">{question.Quantity1}</div>
                     {/* Add image for Quantity 1 */}
                     {questionHasImage && <img
                       src={question.imageA}
@@ -73,7 +73,7 @@ const QuantitativeQuestions = ({ question, NextQuestion }) => {
                     }
                   >
                     <div className="font-semibold">Quantity-2:</div>
-                    <div className="pt-2">{question.quantityB}</div>
+                    <div className="pt-2">{question.Quantity2}</div>
                     {/* Add image for Quantity 2 */}
                     {questionHasImage && <img
                       src={question.imageB}
