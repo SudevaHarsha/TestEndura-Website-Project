@@ -27,7 +27,7 @@ const Instructions = ({sessionId}) => {
       return
     }
     setInstructions(instructions + 1);
-    if (currentSection === "VerbalReasoning1" && currentQuestion === 0 /* && currentSession.currentQuestion === 0 */) {
+    if (currentSection === currentSession.test.sections[0] && currentQuestion === 0 /* && currentSession.currentQuestion === 0 */) {
       console.log("first");
       router.push(`/mock-tests/${currentSession.id}`);
       return

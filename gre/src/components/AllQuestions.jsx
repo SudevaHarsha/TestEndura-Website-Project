@@ -11,15 +11,19 @@ import { useTimer } from '@/providers/TimerContext';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { useCurrentSession } from '@/providers/CurrentSessionContext';
+import testQuestions from '@/lib/test-questions';
 
-const AllQuestions = ({ questions, testSession }) => {
+const AllQuestions = ({ questions, testSession, previousSectionsLengths }) => {
 
   const router = useRouter();
 
-  const { currentQuestion, setCurrentQuestion, currentSection, setCurrentSection, nextQuestion, selectedChoices, setSelectedChoices } = useCurrentQuestion();
+  const { currentQuestion, setCurrentQuestion, currentSection, setCurrentSection, nextQuestion, selectedChoices, setSelectedChoices, setPreviousLength, result } = useCurrentQuestion();
   console.log("question", currentQuestion);
   const { currentSession, setCurrentSession } = useCurrentSession();
   console.log(questions);
+
+  const previousLength = previousSectionsLengths.reduce((sum, current) => sum + current, 0);
+  setPreviousLength(previousLength);
 
   const currentDate = new Date();
   const handleNext = async () => {
@@ -32,6 +36,16 @@ const AllQuestions = ({ questions, testSession }) => {
         sectionEndTimes: sectionEndTimes,
       },
     }); */
+    /* if (result) {
+      const sectionKeys = Object.keys(questions);
+      const currentIndex = sectionKeys.indexOf(currentSection);
+      if (currentIndex < sectionKeys.length - 1) {
+        setCurrentSection(sectionKeys[currentIndex + 1]);
+        setCurrentQuestion(0);
+        router.push('/mock-tests/results')
+        return
+      }
+    } */
     StoreQuestion();
     let converteedAnswers;
     if (typeof currentSession.sessionAnswers === 'string' && (data.startsWith('{') || data.startsWith('['))) {
@@ -43,7 +57,7 @@ const AllQuestions = ({ questions, testSession }) => {
     setSelectedChoices([])
   }
 
-  const handleUpdateTimes = async () =>{
+  const handleUpdateTimes = async () => {
     const updatedSessionAnswers = JsonToArray();
     const updatedTestSession = await axios.patch(`/api/updateSectionEndTimes/${currentSession.id}`, { sessionAnswers: [...updatedSessionAnswers, selectedChoices], currentSection: currentSection })
 
@@ -52,7 +66,7 @@ const AllQuestions = ({ questions, testSession }) => {
 
   const handleSubmit = async () => {
     /* const updatedTestSession = await axios.patch(`/api/updateSectionEndTimes/${currentSession.id}`, { sessionAnswers: [...currentSession.sessionAnswers, selectedChoices] }); */
-    handleUpdateTimes();
+    await handleUpdateTimes();
     const results = await axios.post("/api/submit", { sessionId: currentSession.id });
 
     console.log("frontend", results)
@@ -74,18 +88,26 @@ const AllQuestions = ({ questions, testSession }) => {
       const updatedSession = { ...prevSession };
       console.log("up", updatedSession.sessionAnswers)
       const prevAnswers = Array.isArray(updatedSession?.sessionAnswers) ? updatedSession.sessionAnswers : Object.values(updatedSession.sessionAnswers);
-      // Merge the newly selected choices with the existing sessionAnswers
-      updatedSession.sessionAnswers = [...prevAnswers, selectedChoices];
-      return updatedSession;
+
+      if (prevAnswers.length < previousLength + currentQuestion) {
+        // Merge the newly selected choices with the existing sessionAnswers
+        console.log(previousLength);
+        updatedSession.sessionAnswers = [...prevAnswers, selectedChoices];
+        return updatedSession;
+      } else {
+        console.log("previous enabled")
+        updatedSession.sessionAnswers[previousLength + currentQuestion] = selectedChoices;
+        return updatedSession;
+      }
     });
 /*     setCurrentSession([...currentSession.sessionAnswers, selectedChoices])
  */    setSelectedChoices([]);
   }
 
   const NextQuestion = () => {
-    if (currentSection === "QuantativeReasoning2") {
+    if (currentSection === currentSession.test.sections[currentSession.test.sections.length - 1]) {
       console.log("entered");
-      setCurrentSection('VerbalReasoning1');
+      setCurrentSection(currentSession.test.sections[0]);
       setCurrentQuestion(0);
       handleSubmit();
       router.push("/submission")
@@ -108,7 +130,7 @@ const AllQuestions = ({ questions, testSession }) => {
           return <QuantitativeQuestions key={index} question={question} NextQuestion={NextQuestion} />;
         } else if (question.questionType.type === "Reading Comprehension") {
           return <ReadingCompehension key={index} question={question} NextQuestion={NextQuestion} />;
-        } else if (question.questionType.type === "Analytical Writing") {
+        } else if (question.questionType.type === "AnalyticalWriting") {
           return <AnalyticalWriting key={index} question={question} NextQuestion={NextQuestion} />;
         }
       }

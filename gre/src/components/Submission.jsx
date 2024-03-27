@@ -20,10 +20,11 @@ const Submission = () => {
         </CardDescription>
       </Card>
 
-      <div className="mt-8">
+      <div className="mt-8 flex gap-7">
         <Link href="/">
-          <Button variant="primary">Return to Home</Button>
+          <Button variant="primary" className="flex justify-center items-center m-0">Return to Home</Button>
         </Link>
+        <Button className="h-11 text-white bg-strong hover:bg-strong/90 px-3 my-auto text-center mb-0" >View Results</Button>
       </div>
     </div>
   );

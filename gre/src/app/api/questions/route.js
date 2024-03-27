@@ -8,6 +8,7 @@ export async function POST(req, res) {
     testId,
     typeId,
     questionText,
+    prompt,
     numberOfOptions,
     options,
     correctAnswer,
@@ -22,13 +23,19 @@ export async function POST(req, res) {
     highlightedSentence,
     Quantity1,
     Quantity2,
-    correctSentence
+    correctSentence,
+    numerator,
+    denominator,
+    units,
+    correctNumeric,
+    description
   } = await req.json();
   try {
     console.log(
       testId,
       typeId,
       questionText,
+      prompt,
       numberOfOptions,
       options,
       correctAnswer,
@@ -42,7 +49,12 @@ export async function POST(req, res) {
       paragraph,
       highlightedSentence,
       Quantity2,
-      correctSentence
+      correctSentence,
+      numerator,
+      denominator,
+      units,
+      correctNumeric,
+      description
     );
     /*   const newQuestion = await db.question.create({
       data: {
@@ -68,12 +80,33 @@ export async function POST(req, res) {
 
     if (
       questionTypes.find((Qtype) => Qtype.id === typeId)?.type ===
+      "Analytical Writing"
+    ) {
+      const sentences = paragraph.split(". ");
+      const index = sentences.find((sentence, index) => {
+        if (sentence === correctAnswer) return index;
+      });
+      const newQuestion = await db.analyticalWritingQuestion.create({
+        data: {
+          testId,
+          typeId,
+          questionText,
+          correctAnswer,
+          questionText,
+          section,
+          description,
+          prompt,
+        },
+      });
+    }
+    if (
+      questionTypes.find((Qtype) => Qtype.id === typeId)?.type ===
       "Reading Comprehension"
     ) {
       const sentences = paragraph.split(". ");
-      const index = sentences.find((sentence,index) => {
-        if(sentence===correctAnswer) return index
-      })
+      const index = sentences.find((sentence, index) => {
+        if (sentence === correctAnswer) return index;
+      });
       const newQuestion = await db.readingComprehensionQuestion.create({
         data: {
           testId,
@@ -86,6 +119,7 @@ export async function POST(req, res) {
           select,
           highlighted,
           section,
+          description,
           paragraph,
           highlightedSentence,
         },
@@ -98,12 +132,16 @@ export async function POST(req, res) {
           typeId,
           questionText,
           options,
-          option: parseInt(correctAnswer.length),
           correctAnswer,
           blankType,
           section,
+          description,
           numberOfBlanks,
           blankOptions,
+          numerator:parseInt(numerator),
+          denominator:parseInt(denominator),
+          units,
+          correctNumeric: parseInt(correctNumeric)
         },
       });
     }
@@ -118,6 +156,7 @@ export async function POST(req, res) {
           correctAnswer,
           image,
           section,
+          description,
         },
       });
     }
@@ -134,6 +173,7 @@ export async function POST(req, res) {
           option: parseInt(correctAnswer.length),
           correctAnswer,
           section,
+          description,
           Quantity1,
           Quantity2,
         },

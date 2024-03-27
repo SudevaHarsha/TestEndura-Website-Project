@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardDescription,
@@ -15,10 +15,12 @@ import TimerClock from "../Timer";
 import Image from "next/image"
 import Options from "./Options";
 import { useCurrentQuestion } from "@/providers/CurrentQuestionContext";
+import { useCurrentSession } from "@/providers/CurrentSessionContext";
+import { FaCheck, FaCross } from "react-icons/fa";
 
 const OpenEndedQuestions = ({ question, NextQuestion }) => {
-  const blanksNumber = Array(5).fill(question.numberOfBlanks);
-  console.log(blanksNumber);
+  /* const blanksNumber = Array(5).fill(question.numberOfBlanks);
+  console.log(blanksNumber); */
 
   const blanksData = [
     {
@@ -41,21 +43,58 @@ const OpenEndedQuestions = ({ question, NextQuestion }) => {
     },
     // Add more blank question data as needed
   ];
-  const { currentQuestion,currentSection } = useCurrentQuestion();
 
-
-  const [selectedChoices, setSelectedChoices] = useState([]);
-  const [currentBlankIndex, setCurrentBlankIndex] = useState(0);
+  const { currentSession } = useCurrentSession();
+  const { selectedChoices, setSelectedChoices, previousLength, currentQuestion, currentSection, result } = useCurrentQuestion();
+  /* const [currentQuestion, currentSection, currentBlankIndex, setCurrentBlankIndex] = useState(0); */
   const questionHasImage = false; // Set this to true if the question has an image
 
   const currentBlank = question;
 
-  const handleBlankChange = () => {
+  useEffect(() => {
+    // When the component mounts, check if there are selected choices for the current question in the session data
+    if (currentSession && Array.isArray(currentSession.sessionAnswers[previousLength + currentQuestion])) {
+      setSelectedChoices(currentSession.sessionAnswers[previousLength + currentQuestion]);
+    } else {
+      setSelectedChoices([]);
+    }
+  }, [currentSession, previousLength, currentQuestion]);
+
+  console.log(previousLength + currentQuestion);
+
+  /* const handleBlankChange = () => {
     setCurrentBlankIndex((prevIndex) =>
       prevIndex < blanksData.length - 1 ? prevIndex + 1 : prevIndex
     );
     setSelectedChoices([]);
+  }; */
+
+  /* console.log(selectedChoices); */
+
+  const maxSelections = question.numberOfBlanks || question.options.length;
+
+  const correctAnswers = question.correctAnswer;
+
+  const handleOptionClick = (index) => {
+    const groupIndex = Math.floor(index / 3); // Calculate the group index based on the option index
+    const startIndex = groupIndex * 3; // Calculate the start index of the group
+    const endIndex = startIndex + 2; // Calculate the end index of the group
+
+    // Remove all options in the group from selectedChoices array
+    const filteredChoices = selectedChoices.filter(
+      (choiceIndex) => choiceIndex < startIndex || choiceIndex > endIndex
+    );
+
+    // Add the clicked option to the selectedChoices array
+    setSelectedChoices([...filteredChoices, index]);
   };
+
+  const groupedOptions = [];
+  for (let i = 0; i < question.blankOptions.length; i += 3) {
+    groupedOptions.push(question.blankOptions.slice(i, i + 3));
+  }
+
+  /*  console.log(selectedChoices); */
 
   return (
     <div className="h-[90vh] md:w-[80vw] max-w-4xl w-[90vw] flex flex-col items-center justify-center">
@@ -65,8 +104,8 @@ const OpenEndedQuestions = ({ question, NextQuestion }) => {
         <div className={`${questionHasImage ? "sm:w-[50%]" : "w-full"}`}>
           <div>
             {
-              
-              <div className="bg-gray-200 p-4 text-strong flex items-center justify-center rounded-2xl text-center">select any of {question.option} from the given options below</div>
+
+              <div className="bg-gray-200 p-4 text-strong flex items-center justify-center rounded-2xl text-center">select any 1 option from the given sets below</div>
             }
           </div>
           <Card className="w-full mt-4 rounded-2xl">
@@ -97,37 +136,140 @@ const OpenEndedQuestions = ({ question, NextQuestion }) => {
                   className="border-b p-2 mb-4 focus:outline-none focus:border-strong/70"
                 />
               ))
-            ) : currentBlank.type === "numeric" ? (
+            ) : currentBlank.blankType === "numeric" ? (
               // Render numeric input
-              <input
-                type="number"
-                placeholder={`Enter a number between ${currentBlank.range.min} and ${currentBlank.range.max}`}
-                value={selectedChoices[0] || ""}
-                onChange={(e) => {
-                  const value = parseInt(e.target.value);
-                  const isValid =
-                    !isNaN(value) &&
-                    value >= currentBlank.range.min &&
-                    value <= currentBlank.range.max;
-                  if (isValid) {
+              <div>
+                <input
+                  type="number"
+                  placeholder={`Enter a number`}
+                  value={selectedChoices[0] || ""}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
                     setSelectedChoices([value]);
-                  }
-                }}
-                className="border-b p-2 mb-4 focus:outline-none focus:border-strong/70"
-              />
-            ) : (
-              // Render multiple-choice options
-              blanksNumber.map(()=>(
-                <Options question={question} selectmode={false} blankOptions={question.blankOptions} />
-              ))
-            )}
+                  }}
+                  className="border-b p-2 mb-4 focus:outline-none focus:border-strong/70"
+                />
+                {result && selectedChoices[0] === question.correctNumeric && <FaCheck />}
+                {result && selectedChoices[0] != question.correctNumeric && selectedChoices[0] && <FaCross />}
+              </div>
+            ) :
+              currentBlank.blankType === "numeric units" ? (
+                <>
+                  <div>
+                    <input
+                      type="number"
+                      placeholder={`Enter a number`}
+                      value={selectedChoices[0] || ""}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        const updatedChoices = [value, selectedChoices[1]];
+                        setSelectedChoices(updatedChoices);
+                      }}
+                      className="border-b p-2 mb-4 focus:outline-none focus:border-strong/70"
+                    />
+                    {result && selectedChoices[0] === question.correctNumeric && <FaCheck />}
+                    {result && selectedChoices[0] != question.correctNumeric && <FaCross />}
+                  </div>
+                  <div>
+                    <input
+                      type="text"
+                      placeholder={`Enter a unit`}
+                      value={selectedChoices[1] || ""}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const updatedChoices = [selectedChoices[0], value];
+                        setSelectedChoices(updatedChoices);
+                      }}
+                      className="border-b p-2 mb-4 focus:outline-none focus:border-strong/70"
+                    />
+                    {result && selectedChoices[1] === question.units && <FaCheck />}
+                    {result && selectedChoices[1] != question.units && <FaCross />}
+                  </div>
+                </>
+              )
+                : currentBlank.blankType === "fraction" ? (
+                  <>
+                    <div>
+                      <input
+                        type="number"
+                        placeholder={`Enter a numerator`}
+                        value={selectedChoices[0] || ""}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value);
+                          const updatedChoices = [value, selectedChoices[1]];
+                          setSelectedChoices(updatedChoices);
+                        }}
+                        className="border-b p-2 mb-4 focus:outline-none focus:border-strong/70"
+                      />
+                      {result && selectedChoices[0] === question.numerator && <FaCheck />}
+                      {result && selectedChoices[0] != question.numerator && <FaCross />}
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        placeholder={`Enter a denominator`}
+                        value={selectedChoices[1] || ""}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value);
+                          const updatedChoices = [selectedChoices[0], value];
+                          setSelectedChoices(updatedChoices);
+                        }}
+                        className="border-b p-2 mb-4 focus:outline-none focus:border-strong/70"
+                      />
+                      {result && selectedChoices[1] === question.denominator && <FaCheck />}
+                      {result && selectedChoices[1] != question.denominator && <FaCross />}
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center w-[85%]">
+                    {groupedOptions.map((group, groupIndex) => (
+                      <div key={groupIndex} className="flex flex-col justify-between w-full mt-4 rounded">
+                        {!result && group.map((option, index) => (
+                          <Button
+                            key={groupIndex * 3 + index}
+                            variant={
+                              selectedChoices.includes(groupIndex * 3 + index)
+                                ? "default"
+                                : "outline"
+                            }
+                            className={`w-[90%] py-4 mb-4 rounded hover:bg-gray-200 ${selectedChoices.includes(groupIndex * 3 + index)
+                              ? "bg-black text-white hover:bg-black"
+                              : "bg-slate-100 text-black"
+                              }`}
+                            onClick={() => handleOptionClick(groupIndex * 3 + index)}
+                          >
+                            {option}
+                          </Button>
+                        ))}
+                        {result && group.map((option, index) => (
+                          <Button
+                            key={groupIndex * 3 + index}
+                            variant={
+                              selectedChoices.includes(groupIndex * 3 + index)
+                                ? "default"
+                                : "outline"
+                            }
+                            className={`w-[90%] py-4 mb-4 rounded hover:bg-gray-200 ${correctAnswers.includes(groupIndex * 3 + index) ? "bg-green-400 text-white hover:bg-green-500 hover:text-white" : selectedChoices.includes(groupIndex * 3 + index) && !correctAnswers.includes(groupIndex * 3 + index)
+                              ? "bg-red-500 text-white hover:bg-red-600"
+                              : "bg-slate-100 text-black"
+                              }`}
+                            onClick={() => handleOptionClick(groupIndex * 3 + index)}
+                          >
+                            {option}
+                          </Button>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                )
+            }
             <Button
               variant="default"
               className="mt-2 bg-strong text-white hover:bg-strong/90"
               size="lg"
               onClick={NextQuestion}
             >
-              {currentSection==="QuantativeReasoning2" && currentQuestion === 19 ? "Submit" : "Next"} <ChevronRight className="w-4 h-4 ml-2 text-white" />
+              {currentSection === "QuantativeReasoning2" && currentQuestion === 19 ? "Submit" : "Next"} <ChevronRight className="w-4 h-4 ml-2 text-white" />
             </Button>
           </div>
         </div>

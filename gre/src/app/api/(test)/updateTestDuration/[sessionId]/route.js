@@ -6,7 +6,7 @@ const { NextResponse } = require("next/server");
 export async function PUT(req, { params }) {    
     try {
         // Fetch the test session from the database
-        const {currentQuestion,currentSection,finished} = await req.json();
+        const {currentQuestion,currentSection,finished,sessionAnswers} = await req.json();
         const testSession = await db.testSession.findUnique({
             where: {
                 id: params.sessionId,
@@ -28,7 +28,8 @@ export async function PUT(req, { params }) {
                 sectionEndTimes: sectionEndTimes,
                 currentQuestion:currentQuestion,
                 currentSection:currentSection,
-                finished:finished
+                finished:false,
+                sessionAnswers:sessionAnswers
             },
         });
 

@@ -15,17 +15,17 @@ export async function GET(req, res) {
 
 export async function POST(req, res) {
   try {
-    const { name, description, duration, sections } = req.body;
+    const { name, description, durations, sections } = await req.json();
 
     console.log(req.body.name);
 
     const newTest = await db.test.create({
       data: {
-        name:"test1",
-        description:"gre",
-        sections: ['AnalyticalWriting','VerbalReasoning1','VerbalReasoning2','QuantativeReasoning1','QuantativeReasoning2'],
-        overallDuration:"120",
-        sectionDuration:['20',"30","25","20","30"]
+        name,
+        description,
+        sections,
+        overallDuration: "120",
+        sectionDuration: durations
       }
     });
 

@@ -1,53 +1,76 @@
-"use client"
-
 import axios from 'axios';
 import React, { useState } from 'react';
 
 const CreateTestForm = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [duration, setDuration] = useState('');
-  const [sections, setSections] = useState('');
+  const [numberOfSections, setNumberOfSections] = useState(0);
+  const [sections, setSections] = useState([]);
+  const [durations, setDurations] = useState([]);
+
+  const handleSectionChange = (index, value) => {
+    const updatedSections = [...sections];
+    updatedSections[index] = value;
+    setSections(updatedSections);
+  };
+
+  const handleDurationChange = (index, value) => {
+    const updatedDurations = [...durations];
+    updatedDurations[index] = value;
+    setDurations(updatedDurations);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log("entered");
       const response = await axios.post('/api/createTest', {
-        name:name,
-        description:description,
-        duration:duration,
-        sections: sections.split(',').map(section => section.trim()) // Split sections by comma and trim whitespace
+        name: name,
+        description: description,
+        numberOfSections: numberOfSections,
+        sections: sections,
+        durations: durations
       });
       console.log('Test created:', response.data);
-      // Handle success, e.g., show a success message or redirect
+      // Handle success
     } catch (error) {
       console.error('Error creating test:', error.response.data.error);
-      // Handle error, e.g., show an error message
+      // Handle error
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Name:
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-      </label>
-      <label>
-        Description:
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
-      </label>
-      <label>
-        Duration:
-        <input type="text" value={duration} onChange={(e) => setDuration(e.target.value)} />
-      </label>
-      <label>
-        Sections:
-        <input type="text" value={sections} onChange={(e) => setSections(e.target.value)} />
-        <small>Separate sections by comma</small>
-      </label>
-      <button type="submit">Create Test</button>
-    </form>
+    <div className='w-full h-full flex items-center'>
+      <div className="w-full max-w-md mx-auto bg-white rounded-lg shadow-lg p-8">
+        <h2 className="text-2xl font-semibold mb-4">Create New Test</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="name" className="block text-gray-700">Name:</label>
+            <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} className="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" />
+          </div>
+          <div>
+            <label htmlFor="description" className="block text-gray-700">Description:</label>
+            <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} className="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"></textarea>
+          </div>
+          <div>
+            <label htmlFor="numberOfSections" className="block text-gray-700">Number of Sections:</label>
+            <input type="number" id="numberOfSections" value={numberOfSections} onChange={(e) => setNumberOfSections(parseInt(e.target.value))} min="0" className="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" />
+          </div>
+          {Array.from({ length: numberOfSections }).map((_, index) => (
+            <div key={index} className="flex space-x-4">
+              <div className="flex-grow">
+                <label htmlFor={`section-${index}`} className="block text-gray-700">{`Section ${index + 1}:`}</label>
+                <input type="text" id={`section-${index}`} value={sections[index] || ''} onChange={(e) => handleSectionChange(index, e.target.value)} className="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" />
+              </div>
+              <div>
+                <label htmlFor={`duration-${index}`} className="block text-gray-700">{`Duration:`}</label>
+                <input type="text" id={`duration-${index}`} value={durations[index] || ''} onChange={(e) => handleDurationChange(index, e.target.value)} className="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" />
+              </div>
+            </div>
+          ))}
+          <button type="submit" className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition duration-200">Create Test</button>
+        </form>
+      </div>
+    </div>
   );
 };
 

@@ -4,16 +4,14 @@ import { NextResponse } from 'next/server';
 import { db } from "@/lib/db";
 import { data } from 'autoprefixer';
 
-export async function POST(req, res) {
-
-  const { sessionId } = await req.json();
+export async function GET(req,{params}) {
 
   try {
     // Fetch questions for the given test session
-    console.log(sessionId);
+    console.log(params.sessionId);
     const testSession = await db.testSession.update({
         where: {
-          id: sessionId,
+          id: params.sessionId,
         },
         data: {
           finished: true
@@ -87,61 +85,7 @@ export async function POST(req, res) {
 
     console.log("ALL",AllQuestions)
 
-    // Evaluate the answers and store results in an array
-    const results = [];
-    console.log(testSession.sessionAnswers);
-    for (const [questionId, userAnswer] of Object.entries(testSession.sessionAnswers)) {
-      const question = AllQuestions[questionId];
-      console.log(questionId,question);
-      if (!question) {
-        return new NextResponse(500);
-      }
-
-      const correctAnswer = question?.select ? question?.correctSentence :question.correctAnswer || [];
-      let isCorrect = question?.select ? correctAnswer === userAnswer[0] : arraysEqual(userAnswer.sort(), correctAnswer.sort());
-      if(question.blankType === 'fraction' && question?.denominator >0) {
-        console.log(userAnswer[0])
-        console.log(userAnswer[1])
-        let isNumerator = userAnswer[0] === question?.numerator
-        let isDenominator = userAnswer[1] === question?.denominator
-        console.log(isDenominator,isNumerator)
-        isCorrect = isNumerator && isDenominator;
-      }
-      if(question.blankType === 'numeric units') {
-        console.log(userAnswer[0])
-        console.log(userAnswer[1])
-        let isNumeric = userAnswer[0] === question?.correctNumeric
-        let isUnits = userAnswer[1] === question?.units
-        console.log(isNumeric,isUnits)
-        isCorrect = isNumeric && isUnits;
-      }
-      if(question.blankType === 'numeric' && question?.correctNumeric > 0) {
-        console.log(userAnswer[0])
-        let isNumeric = userAnswer[0] === question?.correctNumeric
-        console.log(isNumeric);
-        isCorrect = isNumeric;
-      }
-      if(question?.select === true) {
-        console.log(userAnswer[0],question?.correctSentence)
-        const isSentence = question.correctSentence.includes(userAnswer[0]);
-        console.log(isSentence);
-        isCorrect = isSentence;
-      }
-      results.push(isCorrect);
-    }
-
-    console.log(results);
-
-    const resultSession = await db.testSession.update({
-      where: {
-        id: sessionId
-      },
-      data: {
-        results: results
-      }
-    });
-
-    return new NextResponse(200, { results });
+    return new NextResponse(200, { AllQuestions });
   } catch (error) {
     console.error('Error evaluating quiz:', error);
     return new NextResponse(500);

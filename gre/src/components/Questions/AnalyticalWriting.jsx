@@ -5,9 +5,11 @@ import { CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from "@/components/ui/textarea"
 import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
+import { useCurrentSession } from '@/providers/CurrentSessionContext';
 
 const AnalyticalWritingPage = ({NextQuestion}) => {
   const {setCurrentQuestion} = useCurrentQuestion();
+  const {currentSession} = useCurrentSession();
   const handleSubmitEssay = (essay) => {
     // Handle submission logic here
     console.log('Submitted Essay:', essay);
@@ -28,9 +30,7 @@ const AnalyticalWritingPage = ({NextQuestion}) => {
         <div className="flex flex-col items-center justify-center p-2 text-justify">
           <CardDescription className="w-[90%]">
             <p className='border-b-2 mb-2 pb-1'>
-              <strong>Prompt:</strong> Analyze the reasoning and evidence presented in the following argument. Write a
-              response in which you discuss what specific evidence is needed to evaluate the argument and explain how
-              the evidence would weaken or strengthen the argument.
+              <strong>Prompt:</strong> {currentSession.prompt}
             </p>
             <p>
               <em>Argument:</em> The following appeared in a memo from the director of a large group of hospitals.

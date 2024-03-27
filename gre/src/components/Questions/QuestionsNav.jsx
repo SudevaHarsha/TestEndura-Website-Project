@@ -25,7 +25,7 @@ const QuestionsNav = ({ questionLength, test, testSession }) => {
     const endTime = new Date(currentTime.getTime() + "30" * 60000);
 
     const { currentQuestion, setCurrentQuestion, nextQuestion, currentSection } = useCurrentQuestion();
-    const {currentSession} = useCurrentSession();
+    const { currentSession } = useCurrentSession();
     /* const {sessionStarted, sessionExpired, minutes, seconds, resetTimer, duration} = useTimer(); */
 
     const PreviousQuestion = () => {
@@ -34,19 +34,19 @@ const QuestionsNav = ({ questionLength, test, testSession }) => {
     };
 
     const handleExit = async () => {
-       /*  const url = qs.stringifyUrl({
-            url: `/api/updateTestDuration/${testSession.id}`,
-            query: socketQuery,
-          }); */
-        const response = await axios.put(`/api/updateTestDuration/${currentSession ? currentSession.id : testSession.id}`,{
-            currentQuestion,currentSection,finished:false
+        /*  const url = qs.stringifyUrl({
+             url: `/api/updateTestDuration/${testSession.id}`,
+             query: socketQuery,
+           }); */
+        const response = await axios.put(`/api/updateTestDuration/${currentSession ? currentSession.id : testSession.id}`, {
+            currentQuestion, currentSection, finished: false, sessionAnswers: currentSession.sessionAnswers
         });
         console.log(response.testSession);
         router.push("/mock-tests")
     }
 
-/*     let totalDuration = 0;
- */
+    /*     let totalDuration = 0;
+     */
     /* const handleExitSection = async () => {
         const sectionEndTimes = test.sectionDuration.map((duration, index) => {
             totalDuration += parseInt(duration) + (index > 0 ? 15 : 0); // Add break time between sections starting from the second section
@@ -76,7 +76,7 @@ const QuestionsNav = ({ questionLength, test, testSession }) => {
                 <p>
                     <span className="text-slate-400">Topic</span> &nbsp;
                     <span className="px-2 py-1 text-white rounded-lg bg-slate-800">
-                        an gre test
+                        {currentSection}
                     </span>
                 </p>
                 <div className="flex self-start mt-3 text-slate-400">
@@ -85,14 +85,25 @@ const QuestionsNav = ({ questionLength, test, testSession }) => {
                 </div>
             </div>
             <div>
-                Question {currentQuestion + 1} <span>{"/" + questionLength}</span>
+                Question <span className='font-bold'>{currentQuestion + 1}</span> <span>{"/" + questionLength}</span>
             </div>
-            <div className="text center">
-                <Button onClick={PreviousQuestion} className="h-11 text-white bg-strong hover:bg-strong/90 px-3 my-auto text-center"><ChevronLeft className="w-4 h-4 mr-2 text-white" /> previous</Button>
+            <div className='flex gap-6'>
+                <div>
+                    <div className="text center">
+                        <Button className="h-11 w-20 text-white bg-strong hover:bg-strong/90 px-3 my-auto text-center">Help</Button>
+                    </div>
+                </div>
+                <div className='flex gap-4'>
+                    <div className="text center">
+                        <Button onClick={PreviousQuestion} className="h-11 text-white bg-strong hover:bg-strong/90 px-3 my-auto text-center"><ChevronLeft className="w-4 h-4 mr-2 text-white" /> previous</Button>
+                    </div>
+                    <div className="text center">
+                        <Button onClick={handleExit} className="h-11 text-white bg-red-600 hover:bg-red-600/90 px-3 my-auto text-center"> Exit Test</Button>
+                    </div>
+                </div>
             </div>
-            <div className="text center">
-                <Button onClick={handleExit} className="h-11 text-white bg-red-600 hover:bg-red-600/90 px-3 my-auto text-center"><ChevronLeft className="w-4 h-4 mr-2 text-white" /> previous</Button>
-            </div>
+
+
         </div>
     )
 }

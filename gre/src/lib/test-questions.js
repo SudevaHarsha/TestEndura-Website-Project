@@ -1,11 +1,10 @@
-import { db } from '@/lib/db';
-import React from 'react'
-import RemainingCards from './remainingCards/index';
+import { db } from './db';
 
-const RemainingCardsCaller = async() => {
-    const filteredSessions = await db.testSession.findMany({
+const testQuestions = async (sessionId) => {
+    console.log(sessionId);
+    const testSession = await db.testSession.findUnique({
         where: {
-          finished: false
+          id: sessionId,
         },
         include: {
           test: {
@@ -44,19 +43,25 @@ const RemainingCardsCaller = async() => {
           },
         },
       });
-      
-/*       const testSessions = filteredSessions.filter(session => {
-        // Convert duration and endTime to appropriate types if necessary
-        const duration = new Date(session.duration);
-        const endTime = new Date(session.endTime);
-      
-        // Compare the duration with endTime
-        return duration < endTime;
-      }); */
+        
+    const questions = [
+      ...testSession.test.Questions,
+      ...testSession.test.analyticalWritingQuestions,
+      ...testSession.test.quantitativeQuestions,
+      ...testSession.test.readingComprehensionQuestions,
+      ...testSession.test.multipleAnswerQuestions,
+      ...testSession.test.multipleChoiceQuestions,
+    ];
+    
+    const sections = testSession.test.sections.reduce((acc, section) => {
+      const sectionQuestions = questions.filter(
+        (question) => question.section === section
+      );
+      acc[section] = sectionQuestions;
+      return acc;
+    }, {});
 
-        return <div className='flex items-center justify-center w-full'>
-          <RemainingCards filteredSessions={filteredSessions} />
-        </div>
+    return sections
 }
 
-export default RemainingCardsCaller
+export default testQuestions

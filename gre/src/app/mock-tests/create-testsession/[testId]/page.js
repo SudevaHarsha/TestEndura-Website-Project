@@ -41,6 +41,9 @@ const page = async ({ testId }) => {
       sectionEndTimes: [], // Add test duration in minutes
       sessionAnswers: []
     },
+    include: {
+      test:true
+    }
   });
 
   console.log(testSession.id);

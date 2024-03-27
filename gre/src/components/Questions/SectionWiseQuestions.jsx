@@ -9,6 +9,7 @@ import Timeout from '../TimeOut';
 import { useRouter } from 'next/navigation';
 import { useCurrentSession } from '@/providers/CurrentSessionContext';
 import axios from 'axios';
+import testQuestions from '@/lib/test-questions';
 
 const SectionWiseQuestions = ({test,testSession,questions}) => {
 
@@ -19,6 +20,21 @@ const SectionWiseQuestions = ({test,testSession,questions}) => {
     console.log("question", currentQuestion);
     console.log(currentSection)
 
+    let lengthsOfPreviousPairs = [];
+
+    const previousQuestionsLength = () => {
+      const keysArray = Object.keys(questions); // Convert keys to array
+      const index = keysArray.indexOf(currentSection);
+      const valuesArray = Object.values(questions);
+
+      const lengths = valuesArray.map(innerArray => innerArray.length)
+  
+      console.log(lengths);
+
+      return lengths.slice(0,index)
+    }
+    const previousSectionsLengths = previousQuestionsLength();
+    console.log(previousSectionsLengths);
 /*     setCurrentSession(testSession);
  */   /*  const cquestions = questions[currentSection];
     console.log(cquestions); */
@@ -43,7 +59,7 @@ const SectionWiseQuestions = ({test,testSession,questions}) => {
     return (
         <>
             <QuestionsNav questionLength={questions[currentSection].length} testSession={testSession} test={test}/>
-            <AllQuestions questions={questions[currentSection]} testSession={testSession}/>
+            <AllQuestions questions={questions[currentSection]} testSession={testSession} previousSectionsLengths={previousSectionsLengths}/>
             {/* <Timeout handleNextSection={handleNextSection} /> */}
         </>
     );

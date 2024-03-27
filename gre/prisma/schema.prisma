@@ -19,6 +19,7 @@ model Profile {
   name     String
   imageUrl String
   email    String
+  role     String @default("user")
 
   testSessions TestSession[]
 
@@ -41,6 +42,7 @@ model Test {
   multipleAnswerQuestions       MultipleAnswerQuestion[]
   readingComprehensionQuestions ReadingComprehensionQuestion[]
   quantitativeQuestions         QuantitativeQuestion[]
+  analyticalWritingQuestions    AnalyticalWritingQuestion[]
 }
 
 model TestSession {
@@ -57,6 +59,7 @@ model TestSession {
   finished          Boolean  @default(false)
 
   sessionAnswers Json
+  results        Boolean[]
 
   profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   test    Test    @relation(fields: [testId], references: [id], onDelete: Cascade)
@@ -74,18 +77,20 @@ model QuestionType {
   multipleAnswerQuestions       MultipleAnswerQuestion[]
   readingComprehensionQuestions ReadingComprehensionQuestion[]
   quantitativeQuestions         QuantitativeQuestion[]
+  analyticalWritingQuestions    AnalyticalWritingQuestion[]
 }
 
 model ReadingComprehensionQuestion {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  typeId        String   @db.ObjectId
-  testId        String   @db.ObjectId
-  correctAnswer Int[]
-  correctSentence  String[]
-  questionText  String
-  options       String[]
-  section       String
-  paragraph     String
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  typeId          String   @db.ObjectId
+  testId          String   @db.ObjectId
+  correctAnswer   Int[]
+  correctSentence String[]
+  questionText    String
+  options         String[]
+  section         String
+  paragraph       String
+  description     String?
 
   highlighted         Boolean?
   select              Boolean?
@@ -104,11 +109,15 @@ model MultipleAnswerQuestion {
   questionText  String
   options       String[]
   section       String
+  description     String?
 
   blankType      String?
   numberOfBlanks Int?
   blankOptions   String[]
-  option         Int?
+  numerator      Int?
+  denominator    Int?
+  units          String?
+  correctNumeric Int?
 
   test         Test         @relation(fields: [testId], references: [id], onDelete: Cascade)
   questionType QuestionType @relation(fields: [typeId], references: [id], onDelete: Cascade)
@@ -122,6 +131,7 @@ model MultipleChoiceQuestion {
   questionText  String
   options       String[]
   section       String
+  description     String?
 
   image  Boolean?
   option Int?
@@ -138,10 +148,26 @@ model QuantitativeQuestion {
   questionText  String
   options       String[]
   section       String
+  description     String?
 
   Quantity1 String
   Quantity2 String
   option    Int?
+
+  test         Test         @relation(fields: [testId], references: [id], onDelete: Cascade)
+  questionType QuestionType @relation(fields: [typeId], references: [id], onDelete: Cascade)
+}
+
+model AnalyticalWritingQuestion {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  typeId        String @db.ObjectId
+  testId        String @db.ObjectId
+  correctAnswer Int[]
+  questionText  String
+  section       String
+  description     String?
+
+  prompt String
 
   test         Test         @relation(fields: [testId], references: [id], onDelete: Cascade)
   questionType QuestionType @relation(fields: [typeId], references: [id], onDelete: Cascade)
@@ -156,6 +182,7 @@ model Question {
   correctAnswer Int[]
   section       String
   paragraph     String
+  description     String?
 
   highlighted         Boolean?
   blankType           String?

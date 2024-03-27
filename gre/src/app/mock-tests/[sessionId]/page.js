@@ -183,6 +183,11 @@ const TestPage = async ({ sessionId }) => {
               questionType: true,
             }
           },
+          analyticalWritingQuestions: {
+            include: {
+              questionType: true,
+            }
+          },
           quantitativeQuestions: {
             include: {
               questionType: true,
@@ -226,7 +231,7 @@ const TestPage = async ({ sessionId }) => {
   });
   console.log(fetchedQuestions); */
 
-  const testId = testSession.test.testId;
+/*   const testId = testSession.test.testId; */
 
 /*   const questions = await db.question.findMany({
     where: { testId },
@@ -235,9 +240,9 @@ const TestPage = async ({ sessionId }) => {
     }
   }); */
 
-/*   console.log(testSession.test) */
+  console.log(testSession)
 
-  const questions = [...testSession.test.Questions,...testSession.test.quantitativeQuestions,...testSession.test.readingComprehensionQuestions,...testSession.test.multipleAnswerQuestions,...testSession.test.multipleChoiceQuestions];
+  const questions = [...testSession.test.Questions,...testSession.test.analyticalWritingQuestions,...testSession.test.quantitativeQuestions,...testSession.test.readingComprehensionQuestions,...testSession.test.multipleAnswerQuestions,...testSession.test.multipleChoiceQuestions];
 
   const sections = testSession.test.sections.reduce((acc, section) => {
     const sectionQuestions = questions.filter(

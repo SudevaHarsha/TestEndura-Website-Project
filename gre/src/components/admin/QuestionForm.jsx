@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
 
-const CreateQuestionForm = ({ questionTypes, tests }) => {
+const CreateQuestionForm = ({ questionTypes, tests, question }) => {
   const [formData, setFormData] = useState({
     testId: '',
     typeId: '',
     questionText: '',
+    prompt: '',
     numberOfOptions: 0,
     options: [],
     correctAnswer: [],
@@ -18,13 +20,49 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
     image: false,
     section: '',
     numberOfBlanks: 0, // New state for number of blanks
-    blankOptions: [''],
+    blankOptions: [],
     paragraph: '',
     highlightedSentence: '',
-    correctSentence : '',
+    correctSentence: '',
     Quantity1: '',
-    Quantity2: ''
+    Quantity2: '',
+    numerator: 0,
+    denominator: 0,
+    units: '',
+    correctNumeric: 0,
   });
+  const { edited } = useCurrentQuestion();
+
+  useEffect(() => {
+    if (edited && question) {
+      setFormData({
+        testId: question.testId || '',
+        typeId: question.typeId || '',
+        questionText: question?.questionText || '',
+        prompt: question?.prompt || '',
+        numberOfOptions: question?.options?.length || 0,
+        options: question.options || [],
+        correctAnswer: question?.correctAnswer || [],
+        description: question?.description || '',
+        highlighted: question?.highlighted || false,
+        blankType: question?.blankType || '',
+        select: question?.select || false,
+        image: question?.image || false,
+        section: question.section || '',
+        numberOfBlanks: question?.blankOptions?.length/3 || 0, // New state for number of blanks
+        blankOptions: question?.blankOptions || [],
+        paragraph: question.paragraph || '',
+        highlightedSentence: question.highlightedSentence || '',
+        correctSentence: question.correctSentence || '',
+        Quantity1: question.Quantity1 || '',
+        Quantity2: question.Quantity2 || '',
+        numerator: question.numerator || 0,
+        denominator: question.denominator || 0,
+        units: question.units || '',
+        correctNumeric: question.correctNumeric || 0,
+      });
+    }
+  }, [question, edited])
 
   /*   const [questionTypes, setQuestionTypes] = useState([]);
   
@@ -84,25 +122,24 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
 
   // Function to render blank option inputs
   const renderBlankOptionsInputs = () => {
-    return Array.from({ length: formData.numberOfBlanks }).map((_, index) => (
-      <div key={index} className="mb-4">
-        Blank {index + 1} Options:
+    return Array.from({ length: formData.numberOfBlanks }).map((_, blankIndex) => (
+      <div key={blankIndex} className="mb-4">
+        Blank {blankIndex + 1} Options:
         <div className="flex flex-col">
           {Array.from({ length: 3 }).map((_, optionIndex) => (
-            <div key={index} className="mb-4">
+            <div key={optionIndex} className="mb-4">
               <input
-                key={optionIndex}
                 type="text"
-                value={formData.blankOptions[index * 3 + optionIndex] || ''}
-                onChange={(e) => handleBlankOptionChange(e, index * 3 + optionIndex)}
+                value={formData.blankOptions[blankIndex * 3 + optionIndex] || ''}
+                onChange={(e) => handleBlankOptionChange(e, blankIndex * 3 + optionIndex)}
                 className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
               />
               <label className="block mt-2">
                 <input
                   type="checkbox"
-                  name={`correctOptions[${optionIndex}]`}
-                  checked={formData.correctAnswer.includes(optionIndex)}
-                  onChange={(e) => handleCorrectOptionChange(e, optionIndex)}
+                  name={`correctOptions[${blankIndex}][${optionIndex}]`}
+                  checked={formData.correctAnswer.includes(blankIndex * 3 + optionIndex)}
+                  onChange={(e) => handleCorrectBlankOptionChange(e, blankIndex, optionIndex)}
                   className="mr-2"
                 />
                 Correct Option
@@ -127,10 +164,36 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
     });
   };
 
+  const handleCorrectBlankOptionChange = (e, blankIndex, optionIndex) => {
+    const { checked } = e.target;
+    setFormData((prevFormData) => {
+      const updatedCorrectAnswers = [...prevFormData.correctAnswer];
+      const optionPosition = blankIndex * 3 + optionIndex;
+      if (checked) {
+        updatedCorrectAnswers.push(optionPosition);
+      } else {
+        const indexToRemove = updatedCorrectAnswers.indexOf(optionPosition);
+        if (indexToRemove !== -1) {
+          updatedCorrectAnswers.splice(indexToRemove, 1);
+        }
+      }
+      return {
+        ...prevFormData,
+        correctAnswer: updatedCorrectAnswers,
+      };
+    });
+  };
+
   const handleCreateQuestion = async () => {
     try {
       // Send form data to backend for question creation
       console.log(formData);
+
+      if(edited && question) {
+        const response = axios.patch(`/api/questions/${question.id}/${question.typeId}`,{...formData});
+        console.log("Question edited successfully: ",(await response).data.Question);
+        return
+      }
       const response = await axios.post('/api/questions', { ...formData });
       console.log('Question created successfully:', response.data);
       // Reset form after successful creation
@@ -138,6 +201,7 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
         testId: '',
         typeId: '',
         questionText: '',
+        prompt: '',
         numberOfOptions: 0,
         options: [],
         correctAnswer: [],
@@ -148,12 +212,17 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
         image: false,
         section: '',
         numberOfBlanks: 0, // New state for number of blanks
-        blankOptions: [''],
+        blankOptions: [],
         paragraph: '',
         highlightedSentence: '',
-        correctSentence : '',
+        correctSentence: '',
         Quantity2: '',
-        Quantity1: ''
+        Quantity1: '',
+        numerator: 0,
+        denominator: 0,
+        units: '',
+        correctNumeric: 0,
+
       });
     } catch (error) {
       console.error('Error creating question:', error);
@@ -161,8 +230,8 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-8 p-4 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-4">Create New Question</h2>
+    <div className="mx-auto mt-8 p-4 bg-white shadow-md rounded-lg w-full">
+      <h2 className="text-2xl font-bold mb-4">{edited ? "Edit" : "Create New"} Question</h2>
       <label className="block mb-4">
         Test:
         <select
@@ -247,7 +316,9 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
           >
             <option value="">Select Blank Type</option>
             <option value="normal">Normal</option>
-            <option value="input">Input</option>
+            <option value="numeric">Numeric</option>
+            <option value="numeric units">Numeric Units</option>
+            <option value="fraction">Fraction</option>
           </select>
         </div>
       )}
@@ -267,7 +338,7 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
           {renderBlankOptionsInputs()}
         </>
       )}
-      {!formData.select && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type != 'Blank' && <label className="block mb-4">
+      {!formData.select && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type != 'Analytical Writing' && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type != 'Blank' && <label className="block mb-4">
         Number of Options:
         <input
           type="number"
@@ -277,7 +348,7 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
           className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
         />
       </label>}
-      {formData.select && <label className="block mb-4">
+      {!formData.blankType === "numeric units" && !formData.blankType === "numeric" && formData.select && <label className="block mb-4">
         Correct Answer:
         <input
           type="text"
@@ -409,6 +480,65 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
           className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
         />
       </label> */}
+      {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'Analytical Writing' && (
+        <label className="block mb-4">
+          Prompt:
+          <textarea
+            name="prompt" // Corrected to lowercase "prompt"
+            value={formData.prompt}
+            onChange={handleChange}
+            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </label>
+      )}
+      {formData.blankType === 'fraction' && (
+        <div className="mb-4">
+          <label className="block mb-2 font-bold">Correct Answer (Numerator):</label>
+          <input
+            type="number"
+            name="numerator"
+            value={formData.numerator}
+            onChange={handleChange}
+            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+      )}
+      {formData.blankType === 'fraction' && (
+        <div className="mb-4">
+          <label className="block mb-2 font-bold">Correct Answer (Denominator):</label>
+          <input
+            type="number"
+            name="denominator"
+            value={formData.denominator}
+            onChange={handleChange}
+            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+      )}
+      {(formData.blankType === 'numeric' || formData.blankType === "numeric units") && (
+        <div className="mb-4">
+          <label className="block mb-2 font-bold">Correct Answer :</label>
+          <input
+            type="number"
+            name="correctNumeric"
+            value={formData.correctNumeric}
+            onChange={handleChange}
+            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+      )}
+      {formData.blankType === 'numeric units' && (
+        <div className="mb-4">
+          <label className="block mb-2 font-bold">units :</label>
+          <input
+            type="text"
+            name="units"
+            value={formData.units}
+            onChange={handleChange}
+            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+      )}
       <label className="block mb-4">
         Description:
         <textarea
@@ -422,7 +552,7 @@ const CreateQuestionForm = ({ questionTypes, tests }) => {
         onClick={handleCreateQuestion}
         className="block w-full py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
       >
-        Create Question
+        {edited ? "Edit" : "Create"} Question
       </button>
     </div>
   );
