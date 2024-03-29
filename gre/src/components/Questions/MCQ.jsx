@@ -72,7 +72,7 @@ const MCQ = ({question,NextQuestion}) => {
           <Image
             width={200}
             height={150}
-            src="/gre3.jpeg"
+            src={question.ImageUrl}
             alt="Question Image"
             className="w-[80%] mx-auto sm:w-[45%] sm:h-[90%] my-auto object-cover rounded-md sm:mr-4"
           />

@@ -1,3 +1,5 @@
+"use server";
+
 import Instructions from "@/components/Instructions";
 import Intermediete from "@/components/Intermediete";
 import { currentProfile } from "@/lib/current-profile";
@@ -6,10 +8,11 @@ import { redirect } from "next/dist/server/api-utils";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-const page = async ({ testId }) => {
+const page = async ( testId ) => {
   const profile = await currentProfile();
 
   /* const router = useRouter(); */
+  console.log(testId.params.testId);
 
   if (!profile) {
     console.log("User does not exists");
@@ -17,10 +20,10 @@ const page = async ({ testId }) => {
 
   const test = await db.test.findFirst({
     where: {
-      testId: testId,
+      id: testId.params.testId,
     },
   });
-  console.log(test);
+  console.log("Test Found",test);
 
   if (!test) {
     return redirect("/mock-tests");

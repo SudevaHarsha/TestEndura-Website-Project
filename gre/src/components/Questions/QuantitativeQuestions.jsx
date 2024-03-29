@@ -12,6 +12,7 @@ import { ChevronRight, ChevronLeft } from "lucide-react";
 import Options from "./Options";
 import { useCurrentQuestion } from "@/providers/CurrentQuestionContext";
 import { useRouter } from "next/navigation";
+import Image from "next/image"
 
 const QuantitativeQuestions = ({ question, NextQuestion }) => {
   const router = useRouter();
@@ -44,7 +45,9 @@ const QuantitativeQuestions = ({ question, NextQuestion }) => {
   ];
 
   const [selectedChoices, setSelectedChoices] = useState([]);
-  const questionHasImage = question.imageA || question.imageB ? true : false; // Set this to true if the question has an image
+  const questionHasImage = question.image; // Set this to true if the question has an image
+
+  console.log(question.ImageUrl1);
 
   return (
     <div className="h-auto md:w-[80vw] max-w-4xl w-[90vw] flex flex-col justify-center items-center">
@@ -62,8 +65,10 @@ const QuantitativeQuestions = ({ question, NextQuestion }) => {
                     <div className="font-semibold">Quantity-1:</div>
                     <div className="pt-2">{question.Quantity1}</div>
                     {/* Add image for Quantity 1 */}
-                    {questionHasImage && <img
-                      src={question.imageA}
+                    {questionHasImage && <Image
+                    width={100}
+                    height={80}
+                      src={question.ImageUrl1}
                       alt="Quantity 1 Image"
                       className="h-48 w-80 mt-4"
                     />}
@@ -75,8 +80,10 @@ const QuantitativeQuestions = ({ question, NextQuestion }) => {
                     <div className="font-semibold">Quantity-2:</div>
                     <div className="pt-2">{question.Quantity2}</div>
                     {/* Add image for Quantity 2 */}
-                    {questionHasImage && <img
-                      src={question.imageB}
+                    {questionHasImage && <Image
+                    width={100}
+                    height={80}
+                      src={question.ImageUrl2}
                       alt="Quantity 2 Image"
                       className="h-48 w-80 mt-4"
                     />}

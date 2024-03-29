@@ -19,7 +19,7 @@ import { CurrentTestSession, createSession } from "@/lib/create-session";
 import { useCurrentSession } from "@/providers/CurrentSessionContext";
 import axios from "axios";
 
-const TestPage = async ({ sessionId }) => {
+const TestPage = async (sessionId) => {
   /* const questions = [
     {
       type: "Multiple Choice",
@@ -173,7 +173,7 @@ const TestPage = async ({ sessionId }) => {
 
   const testSession = await db.testSession.findFirst({
     where: {
-      id: sessionId,
+      id: sessionId.params.sessionId,
     },
     include: {
       test: {

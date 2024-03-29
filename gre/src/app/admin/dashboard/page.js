@@ -4,16 +4,16 @@ import SideNavbar from "@/components/dashboard/SideNavbar";
 import { currentProfile } from "@/lib/current-profile";
 import { db } from "@/lib/db";
 
-import { RedirectToSignIn, redirectToSignUp } from "@clerk/nextjs";
+import { redirectToSignIn, RedirectToSignIn, redirectToSignUp } from "@clerk/nextjs";
 import { redirect } from "next/dist/server/api-utils";
 
 const AdminDashboard = async () => {
 
-  const profile = currentProfile();
-  console.log(profile.role);
+  const profile = await currentProfile();
+  console.log(profile);
 
-  if(!profile.role === 'admin') {
-    return <RedirectToSignIn />;
+  if(profile.role === 'user') {
+    return <RedirectToSignIn redirectUrl="/sign-in" />;
   }
   const users = await db.profile.findMany();
   return (

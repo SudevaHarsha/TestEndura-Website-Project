@@ -1,10 +1,13 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import Image from 'next/image';
 import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
 
 const CreateQuestionForm = ({ questionTypes, tests, question }) => {
+  const ref = useRef(null);
+  const [urls, setUrls] = useState([]);
   const [formData, setFormData] = useState({
     testId: '',
     typeId: '',
@@ -26,6 +29,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
     correctSentence: '',
     Quantity1: '',
     Quantity2: '',
+    ImageUrl: [],
     numerator: 0,
     denominator: 0,
     units: '',
@@ -49,7 +53,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
         select: question?.select || false,
         image: question?.image || false,
         section: question.section || '',
-        numberOfBlanks: question?.blankOptions?.length/3 || 0, // New state for number of blanks
+        numberOfBlanks: question?.blankOptions?.length / 3 || 0, // New state for number of blanks
         blankOptions: question?.blankOptions || [],
         paragraph: question.paragraph || '',
         highlightedSentence: question.highlightedSentence || '',
@@ -79,7 +83,30 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
         console.error('Error fetching question types:', error);
       }
     }; */
+    
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+    
+      // 2. get reference to the input element
+      const input = ref.current;
+    
+      // 3. build form data
+      const formData = new FormData();
+      const files = Array.from(input.files ?? []);
+      for (const file of files) {
+        formData.append(file.name, file);
+      }
+    
+      // 4. use axios to send the FormData
 
+      await axios.post("/api/upload", formData);
+      setUrls(files.map((file) => `/api/uploads/${file.name}`));
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        ImageUrl: [...prevFormData.ImageUrl, ...files.map((file) => `/api/uploads/${file.name}`)],
+      }));
+    };
+    
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === 'checkbox' || type === 'radio' ? (type === 'checkbox' ? checked : value === 'true') : value;
@@ -189,9 +216,9 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
       // Send form data to backend for question creation
       console.log(formData);
 
-      if(edited && question) {
-        const response = axios.patch(`/api/questions/${question.id}/${question.typeId}`,{...formData});
-        console.log("Question edited successfully: ",(await response).data.Question);
+      if (edited && question) {
+        const response = axios.patch(`/api/questions/${question.id}/${question.typeId}`, { ...formData });
+        console.log("Question edited successfully: ", (await response).data.Question);
         return
       }
       const response = await axios.post('/api/questions', { ...formData });
@@ -218,6 +245,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
         correctSentence: '',
         Quantity2: '',
         Quantity1: '',
+        ImageUrl: [],
         numerator: 0,
         denominator: 0,
         units: '',
@@ -338,7 +366,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           {renderBlankOptionsInputs()}
         </>
       )}
-      {!formData.select && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type != 'Analytical Writing' && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type != 'Blank' && <label className="block mb-4">
+      {!formData.select && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type != 'AnalyticalWriting' && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type != 'Blank' && <label className="block mb-4">
         Number of Options:
         <input
           type="number"
@@ -446,6 +474,61 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           />
         </div>
       )}
+      {
+        formData.image && <>
+        <form onSubmit={handleSubmit}>
+          <input type="file" name="files" ref={ref} multiple />
+          <button
+            type="submit"
+            className="px-2 py-1 rounded-md bg-violet-50 text-violet-500"
+          >
+            Upload
+          </button>
+        </form>
+        {/* display uploaded images */}
+        <div className="relative aspect-video max-h-[400px]">
+          {urls.map((url) => {
+            console.log(url);
+            return (
+              <Image
+                key={url}
+                src={url}
+                alt={url}
+                className="object-cover"
+                fill
+              />
+            );
+          })}
+        </div>
+      </>
+      }
+      {/* {
+        formData.image && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'Quantitative' && <>
+        <form onSubmit={handleSubmit}>
+          <input type="file" name="files" ref={ref} multiple />
+          <button
+            type="submit"
+            className="px-2 py-1 rounded-md bg-violet-50 text-violet-500"
+          >
+            Upload
+          </button>
+        </form>
+        <div className="relative aspect-video max-h-[400px]">
+          {urls.map((url) => {
+            console.log(url);
+            return (
+              <Image
+                key={url}
+                src={url}
+                alt={url}
+                className="object-cover"
+                fill
+              />
+            );
+          })}
+        </div>
+      </>
+      } */}
       {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'Quantitative' && (
         <>
           <label className="block mb-4">
@@ -480,7 +563,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
         />
       </label> */}
-      {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'Analytical Writing' && (
+      {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'AnalyticalWriting' && (
         <label className="block mb-4">
           Prompt:
           <textarea

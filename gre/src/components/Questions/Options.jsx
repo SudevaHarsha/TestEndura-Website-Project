@@ -23,7 +23,7 @@ const Options = ({ question, selectmode }) => {
         // When the component mounts, check if there are selected choices for the current question in the session data
         console.log(currentSession.sessionAnswers[previousLength + currentQuestion]);
         if (currentSession && Array.isArray(currentSession.sessionAnswers[previousLength + currentQuestion])) {
-            if (resume) {
+            if (resume && currentSession && Array.isArray(currentSession.sessionAnswers[previousLength + currentQuestion])) {
                 console.log("entered", currentSession.sessionAnswers[previousLength + currentQuestion + 1]);
                 setSelectedChoices(currentSession.sessionAnswers[previousLength + currentQuestion + 1]);
                 return
@@ -51,9 +51,9 @@ const Options = ({ question, selectmode }) => {
                 <Button
                     key={option}
                     variant={
-                        selectedChoices.includes(index) ? "default" : "outline"
+                        selectedChoices?.includes(index) ? "default" : "outline"
                     }
-                    className={`justify-start w-full py-8 mb-4 rounded hover:bg-gray-200 ${selectedChoices.includes(index)
+                    className={`justify-start w-full py-8 mb-4 rounded hover:bg-gray-200 ${selectedChoices?.includes(index)
                         ? "bg-black text-white hover:bg-black"
                         : "bg-slate-100 text-black"
                         }`}
@@ -63,7 +63,7 @@ const Options = ({ question, selectmode }) => {
                     }}
                 >
                     <div className="flex items-center justify-center">
-                        <div className={`w-7 h-7 mr-5 flex items-center justify-center border ${question.option === 1 ? "rounded-full" : ""} ${selectedChoices.includes(index) ? "" : "border-black"}`}>{index + 1}</div>
+                        <div className={`w-7 h-7 mr-5 flex items-center justify-center border ${question.option === 1 ? "rounded-full" : ""} ${selectedChoices?.includes(index) ? "" : "border-black"}`}>{index + 1}</div>
                         <div className="text-start">{option}</div>
                     </div>
 

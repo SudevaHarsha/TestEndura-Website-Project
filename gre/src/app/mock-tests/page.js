@@ -7,6 +7,7 @@ import Image from 'next/image'
 import Footer from "@/components/Footer";
 import Navbar from "@/components/sections/Navbar";
 import RemainingCards from "@/components/RemainingCardsCaller";
+import { currentProfile } from "@/lib/current-profile";
 
 const page = () => {
 

@@ -80,6 +80,10 @@ model QuestionType {
   analyticalWritingQuestions    AnalyticalWritingQuestion[]
 }
 
+model Instructions {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
 model ReadingComprehensionQuestion {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   typeId          String   @db.ObjectId
@@ -109,7 +113,7 @@ model MultipleAnswerQuestion {
   questionText  String
   options       String[]
   section       String
-  description     String?
+  description   String?
 
   blankType      String?
   numberOfBlanks Int?
@@ -131,9 +135,10 @@ model MultipleChoiceQuestion {
   questionText  String
   options       String[]
   section       String
-  description     String?
+  description   String?
 
   image  Boolean?
+  ImageUrl  String?
   option Int?
 
   test         Test         @relation(fields: [testId], references: [id], onDelete: Cascade)
@@ -148,10 +153,13 @@ model QuantitativeQuestion {
   questionText  String
   options       String[]
   section       String
-  description     String?
+  description   String?
 
   Quantity1 String
   Quantity2 String
+  image Boolean?
+  ImageUrl1 String?
+  ImageUrl2 String?
   option    Int?
 
   test         Test         @relation(fields: [testId], references: [id], onDelete: Cascade)
@@ -159,13 +167,13 @@ model QuantitativeQuestion {
 }
 
 model AnalyticalWritingQuestion {
-  id            String @id @default(auto()) @map("_id") @db.ObjectId
-  typeId        String @db.ObjectId
-  testId        String @db.ObjectId
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  typeId        String  @db.ObjectId
+  testId        String  @db.ObjectId
   correctAnswer Int[]
   questionText  String
   section       String
-  description     String?
+  description   String?
 
   prompt String
 
@@ -182,7 +190,7 @@ model Question {
   correctAnswer Int[]
   section       String
   paragraph     String
-  description     String?
+  description   String?
 
   highlighted         Boolean?
   blankType           String?

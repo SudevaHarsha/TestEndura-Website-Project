@@ -28,7 +28,8 @@ export async function POST(req, res) {
     denominator,
     units,
     correctNumeric,
-    description
+    description,
+    ImageUrl
   } = await req.json();
   try {
     console.log(
@@ -54,7 +55,8 @@ export async function POST(req, res) {
       denominator,
       units,
       correctNumeric,
-      description
+      description,
+      ImageUrl
     );
     /*   const newQuestion = await db.question.create({
       data: {
@@ -80,7 +82,7 @@ export async function POST(req, res) {
 
     if (
       questionTypes.find((Qtype) => Qtype.id === typeId)?.type ===
-      "Analytical Writing"
+      "AnalyticalWriting"
     ) {
       const sentences = paragraph.split(". ");
       const index = sentences.find((sentence, index) => {
@@ -146,6 +148,7 @@ export async function POST(req, res) {
       });
     }
     if (questionTypes.find((Qtype) => Qtype.id === typeId)?.type === "MCQ") {
+      console.log(ImageUrl[0]);
       const newQuestion = await db.multipleChoiceQuestion.create({
         data: {
           testId,
@@ -156,6 +159,7 @@ export async function POST(req, res) {
           correctAnswer,
           image,
           section,
+          ImageUrl : ImageUrl[0],
           description,
         },
       });
@@ -176,6 +180,9 @@ export async function POST(req, res) {
           description,
           Quantity1,
           Quantity2,
+          image,
+          ImageUrl1: ImageUrl[0],
+          ImageUrl2: ImageUrl[1]
         },
       });
     }

@@ -1,22 +1,38 @@
 "use client"
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FiCheckCircle } from 'react-icons/fi';
 import Image from 'next/image';
 import { GifPlayer } from './GifController';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
 
 const TestCard = ({ name, color, index }) => {
 
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
+  const [tests,setTests] = useState([]);
   /*   const gifRef = useRef(null); */
 
   console.log(isHovered);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const tests = await axios.get("/api/find-test");
+        setTests(tests.data.tests)
+
+      } catch (error) {
+        console.error("Error fetching questions:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const handleClick = () => {
-    router.push(`/mock-tests/create-testsession/65f73277ce3e9ee465e53313`)
+    router.push(`/mock-tests/create-testsession/${tests[3]?.id}`)
   }
 
   /*   const togglePlay = () => {
