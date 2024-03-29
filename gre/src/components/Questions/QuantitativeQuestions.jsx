@@ -45,7 +45,7 @@ const QuantitativeQuestions = ({ question, NextQuestion }) => {
   ];
 
   const [selectedChoices, setSelectedChoices] = useState([]);
-  const questionHasImage = question.image; // Set this to true if the question has an image
+  const questionHasImage = question.image; 
 
   console.log(question.ImageUrl1);
 
