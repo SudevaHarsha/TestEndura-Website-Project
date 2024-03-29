@@ -3,14 +3,15 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
+import { Button } from '../ui/button';
 
-const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId }) => {
+const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId, setTestId }) => {
 
     const [questions, setQuestions] = useState([]);
     const [types, setTypes] = useState([]);
     const [tests, setTests] = useState([]);
 
-    const {setEdited} = useCurrentQuestion();
+    const { setEdited } = useCurrentQuestion();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -43,9 +44,9 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
         return lastFourDigits;
     }
 
-    const handleQuestionEdit = ( questionId, typeId ) => {
+    const handleQuestionEdit = (questionId, typeId) => {
         console.log("entered");
-        console.log(questionId,typeId);
+        console.log(questionId, typeId);
         setQuestionId(questionId);
         setTypeId(typeId);
         setNavState('question')
@@ -60,6 +61,10 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
     const TestHeadings = ['Id', 'Name', 'Description', 'Overall Duration', 'Sections'];
 
     console.log(types);
+
+    const handleCreateUser = () => {
+        setNavState('newStudent')
+    }
 
     return (
         <div className='w-full'>
@@ -176,6 +181,10 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
             </div>
 
             <div className="mt-8"></div>
+
+            {navState === 'users' && <div className='mt-5 mb-5'>
+                <Button className="h-11 text-white bg-strong hover:bg-strong/90 px-3 my-auto text-center" onClick={handleCreateUser}>Create User</Button>
+            </div>}
 
             <div className="flex flex-col mt-8  h-[73vh] overflow-hidden sm:rounded-md ">
                 <div className="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
@@ -402,11 +411,11 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
                                                 })}
                                             </td>
                                             <td className="px-6 py-4 whitespace-no-wrap text-right border-b border-gray-200 text-sm leading-5 font-medium cursor-pointer">
-                                                <a
-                                                    className="text-indigo-600 hover:text-indigo-900"
+                                                <div
+                                                    className="text-indigo-600 hover:text-indigo-900" onClick={() => { setEdited(true); setTestId(test.id); setNavState('test') }}
                                                 >
                                                     Edit
-                                                </a>
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-no-wrap text-right border-b border-gray-200 text-sm leading-5 font-medium cursor-pointer">
                                                 <div

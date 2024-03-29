@@ -1,12 +1,25 @@
+import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-const CreateTestForm = () => {
+const CreateTestForm = ({test}) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [numberOfSections, setNumberOfSections] = useState(0);
   const [sections, setSections] = useState([]);
   const [durations, setDurations] = useState([]);
+
+  const { edited } = useCurrentQuestion();
+
+  useEffect(()=>{
+    if(test && edited) {
+      setName(test?.name);
+      setDescription(test?.description);
+      setDurations(test?.sectionDuration);
+      setNumberOfSections(test?.sections?.length);
+      setSections(test?.sections)
+    }
+  },[edited,test])
 
   const handleSectionChange = (index, value) => {
     const updatedSections = [...sections];
@@ -23,6 +36,17 @@ const CreateTestForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      if (edited && test) {
+        const response = axios.patch(`/api/test/${test.id}`,{
+          name: name,
+          description: description,
+          numberOfSections: numberOfSections,
+          sections: sections,
+          durations: durations
+        });
+        console.log("Question edited successfully: ", (await response).data.updatedTest);
+        return
+      }
       const response = await axios.post('/api/createTest', {
         name: name,
         description: description,
@@ -67,7 +91,7 @@ const CreateTestForm = () => {
               </div>
             </div>
           ))}
-          <button type="submit" className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition duration-200">Create Test</button>
+          <button type="submit" className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition duration-200">{edited ? "Edit" : "Create"} Test</button>
         </form>
       </div>
     </div>

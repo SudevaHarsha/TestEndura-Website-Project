@@ -45,7 +45,7 @@ const NavElements = ({ profile }) => {
                 <Link href="/mock-tests/results">
                     <div className="text-[#0c0c0d] hover:bg-[#01b3ef]/80 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Results</div>
                 </Link>
-                <div className="text-[#0c0c0d] hover:bg-[#01b3ef]/80 hover:text-white px-3 py-2 rounded-md text-sm font-medium cursor-pointer" onClick={handleClick}>Dashboard</div>
+                {profile?.role === "admin" && <div className="text-[#0c0c0d] hover:bg-[#01b3ef]/80 hover:text-white px-3 py-2 rounded-md text-sm font-medium cursor-pointer" onClick={handleClick}>Dashboard</div>}
 
                 <div className="h-[70%] bg-[#01b3ef]/80 w-px"></div>
 

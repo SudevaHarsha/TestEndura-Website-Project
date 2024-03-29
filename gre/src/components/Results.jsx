@@ -237,7 +237,7 @@ const ResultsPage = () => {
                   <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iste doloremque pariatur, aliquam adipisci omnis fugiat blanditiis tempora minus aut odio soluta commodi, velit consequuntur non obcaecati labore natus eligendi ex!</p>
                 </div>
               </>;
-            } else if (question.questionType.type === "Blank" || question.type === "input") {
+            } else if (question.questionType.type === "MultipleAnswerQuestion" || question.type === "input" || question.type === "TextCompletion") {
               return <>
                 <OpenEndedQuestions key={index} question={question} NextQuestion={NextQuestion} />
                 <div className="mb-4">

@@ -124,7 +124,7 @@ const AllQuestions = ({ questions, testSession, previousSectionsLengths }) => {
         if (question.questionType.type === "MCQ") {
           console.log('MCQ');
           return <MCQ key={index} question={question} NextQuestion={NextQuestion} />;
-        } else if (question.questionType.type === "Blank" || question.type === "input") {
+        } else if (question.questionType.type === "MultipleAnswerQuestion" || question.type === "input" || question.type === "TextCompletion") {
           return <OpenEndedQuestions key={index} question={question} NextQuestion={NextQuestion} />;
         } else if (question.questionType.type === "Quantitative") {
           return <QuantitativeQuestions key={index} question={question} NextQuestion={NextQuestion} />;

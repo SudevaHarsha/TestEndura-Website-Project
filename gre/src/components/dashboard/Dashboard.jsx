@@ -12,23 +12,18 @@ import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
 import { currentProfile } from '@/lib/current-profile';
 
 import { useRouter } from 'next/navigation';
+import CreateStudentForm from '../admin/CreateStudentForm';
 
 const Dashboard = ({ users }) => {
     const [navState, setNavState] = useState('dashboard');
     const [question, setQuestion] = useState([]);
     const [questionId, setQuestionId] = useState(); // Initialize with 
     const [typeId, setTypeId] = useState(); // Initialize with null
+    const [testId,setTestId] = useState();
+    const [test,setTest] = useState([]);
     /* const [edited, setEdited] = useState(false); */
 
     const {edited,setEdited} = useCurrentQuestion();
-    const router = useRouter();
-
-   /*  const profile = currentProfile();
-    console.log(profile.role); */
-
-    /* if(profile.role != 'admin') {
-      router.back();
-    } */
 
     useEffect(() => {
         const fetchData = async () => {
@@ -47,17 +42,36 @@ const Dashboard = ({ users }) => {
         if (edited && questionId !== null && typeId !== null) {
             fetchData();
         }
-    }, [edited, questionId, typeId]); // Listen to changes in 'edited', 'questionId', and 'typeId'
+    }, [edited, questionId, typeId]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                console.log(questionId,typeId);
+                const response = await axios.get(`/api/test/${testId}`);
+                console.log("Dashboard", response.data.Test);
+                setTest(response.data.Test); // Update state with fetched data
+                /* setEdited(false); */
+            } catch (error) {
+                console.error("Error fetching test:", error);
+            }
+        };
+
+        // Call fetchData only if 'edited' is true and questionId and typeId are not null
+        if (edited && testId !== null) {
+            fetchData();
+        }
+    }, [edited, testId]);
 
     return (
         <div className='flex w-full h-full'>
             <SideNavbar users={users} setNavState={setNavState} />
             {(navState === 'dashboard' || navState === 'users' || navState === 'tests' || navState === 'question types') && (
-                <DashboardTable users={users} setNavState={setNavState} navState={navState} setTypeId={setTypeId} setQuestionId={setQuestionId} />
+                <DashboardTable users={users} setNavState={setNavState} navState={navState} setTypeId={setTypeId} setQuestionId={setQuestionId} setTestId={setTestId} />
             )}
-            {navState === 'test' && (
+            {(navState === 'test' || (edited && navState === 'test')) && (
                 <div className='w-full mr-3'>
-                    <CreateTestForm />
+                    <CreateTestForm test={test} />
                 </div>
             )}
             {navState === 'type' && (
@@ -65,9 +79,14 @@ const Dashboard = ({ users }) => {
                     <QuestionTypeForm />
                 </div>
             )}
-            {(navState === 'question' || edited) && (
+            {(navState === 'question' || (edited && navState === 'question')) && (
                 <div className='w-full mr-3'>
                     <CreateQuestion question={question} />
+                </div>
+            )}
+            {(navState === 'newStudent') && (
+                <div className='w-full mr-3'>
+                    <CreateStudentForm />
                 </div>
             )}
         </div>

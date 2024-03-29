@@ -182,7 +182,7 @@ export async function PATCH(req, {params}) {
         },
       });
     }
-    if (questionTypes.find((Qtype) => Qtype.id === typeId)?.type === "Blank") {
+    if (questionTypes.find((Qtype) => Qtype.id === typeId)?.type === "MultipleAnswerQuestion" || questionTypes.find((Qtype) => Qtype.id === typeId)?.type === "TextCompletion") {
       const editedQuestion = await db.multipleAnswerQuestion.update({
         where : {
           id:params.questionId

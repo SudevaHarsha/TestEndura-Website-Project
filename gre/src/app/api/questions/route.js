@@ -127,7 +127,7 @@ export async function POST(req, res) {
         },
       });
     }
-    if (questionTypes.find((Qtype) => Qtype.id === typeId)?.type === "Blank") {
+    if (questionTypes.find((Qtype) => Qtype.id === typeId)?.type === "MultipleAnswerQuestion" || questionTypes.find((Qtype) => Qtype.id === typeId)?.type === "TextCompletion") {
       const newQuestion = await db.multipleAnswerQuestion.create({
         data: {
           testId,

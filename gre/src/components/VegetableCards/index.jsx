@@ -1,28 +1,32 @@
+"use client"
 // pages/index.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import TestCard from './TestCard';
+import axios from "axios";
 import { FaApple, FaCarrot, FaPepperHot, FaMushroom, FaLeaf, FaEggplant } from 'react-icons/fa'; // Import vegetable icons
 
-const vegetables = [
-  { name: 'Avocado', color: 'bg-green-200' },
-  { name: 'Tomato', color: 'bg-red-500' },
-  { name: 'Carrot', color: 'bg-orange-500' },
-  { name: 'Paprika', color: 'bg-yellow-500' },
-  { name: 'Mushroom', color: 'bg-brown-500' },
-  { name: 'Green Pea', color: 'bg-green-400' },
-  { name: 'Aubergine', color: 'bg-purple-500' },
-  { name: 'Sweet Potato', color: 'bg-orange-600' },
-  { name: 'Turnip', color: 'bg-purple-400' },
-];
-
-
-
-
 const VegetableCards = () => {
+
+  const [tests,setTests] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const tests = await axios.get("/api/find-test");
+        setTests(tests.data.tests)
+
+      } catch (error) {
+        console.error("Error fetching questions:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className="container mx-auto py-8 grid grid-cols-3 gap-4">
-      {vegetables.map((vegetable, index) => (
-        <TestCard key={index} {...vegetable} index={index} />
+      {tests.map((test, index) => (
+        <TestCard key={index} test={test} index={index} />
       ))}
     </div>
   );

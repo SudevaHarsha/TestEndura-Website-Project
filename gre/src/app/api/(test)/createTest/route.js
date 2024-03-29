@@ -16,6 +16,7 @@ export async function GET(req, res) {
 export async function POST(req, res) {
   try {
     const { name, description, durations, sections } = await req.json();
+    const OverallDuration = durations.reduce((accumulator, currentValue) => accumulator + parseInt(currentValue), 0);
 
     console.log(req.body.name);
 
@@ -24,7 +25,7 @@ export async function POST(req, res) {
         name,
         description,
         sections,
-        overallDuration: "120",
+        overallDuration: OverallDuration.toString(),
         sectionDuration: durations
       }
     });
