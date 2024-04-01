@@ -19,6 +19,8 @@ const NavElements = ({ profile }) => {
     const handleClick = () => {
         if(profile.role === "admin") {
             router.push("/admin/dashboard");
+        } else if(profile.role === "teacher") {
+            router.push("/admin/teacher-dashboard");
         } else {
             router.push("/")
         }
@@ -26,7 +28,8 @@ const NavElements = ({ profile }) => {
 
     const router = useRouter();
 
-    return <div className="flex justify-between items-center h-16">
+    return <>
+    <div className="flex justify-between items-center h-16">
         <div className="flex">
             <div className="flex-shrink-0 flex items-center">
                 <Link href="/">
@@ -39,13 +42,16 @@ const NavElements = ({ profile }) => {
                 <Link href="/mock-tests">
                     <div className="text-[#0c0c0d] hover:bg-[#01b3ef]/80 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Mock-Tests</div>
                 </Link>
-                <Link href="/study">
+                {!profile.role === 'teacher' && <Link href="/study">
                     <div className="text-[#0c0c0d] hover:bg-[#01b3ef]/80 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Study</div>
-                </Link>
+                </Link>}
+                {profile.role === 'teacher' && <Link href="/admin/student-view">
+                    <div className="text-[#0c0c0d] hover:bg-[#01b3ef]/80 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Student View</div>
+                </Link>}
                 <Link href="/mock-tests/results">
                     <div className="text-[#0c0c0d] hover:bg-[#01b3ef]/80 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Results</div>
                 </Link>
-                {profile?.role === "admin" && <div className="text-[#0c0c0d] hover:bg-[#01b3ef]/80 hover:text-white px-3 py-2 rounded-md text-sm font-medium cursor-pointer" onClick={handleClick}>Dashboard</div>}
+                {(profile?.role === "admin" || profile?.role === 'teacher') && <div className="text-[#0c0c0d] hover:bg-[#01b3ef]/80 hover:text-white px-3 py-2 rounded-md text-sm font-medium cursor-pointer" onClick={handleClick}>{profile.role === 'teacher' ? "Teacher view" :"Dashboard"}</div>}
 
                 <div className="h-[70%] bg-[#01b3ef]/80 w-px"></div>
 
@@ -107,6 +113,7 @@ const NavElements = ({ profile }) => {
             </div>
         )
     }
+    </>
 }
 
 export default NavElements

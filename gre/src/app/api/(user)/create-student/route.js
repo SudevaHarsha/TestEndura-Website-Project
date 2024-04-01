@@ -6,7 +6,23 @@ import { NextResponse } from "next/server";
 
 export async function POST(req, res) {
   /* const { signUp } = useClerk(); */
-  const { email, password } = await req.json();
+  const {
+    email,
+    password,
+    firstName,
+    lastName,
+    rollNumber,
+    teacherEmailId,
+    address,
+    cityName,
+    country,
+    zipCode,
+    phone,
+    center,
+    joiningDate,
+    expiryDate,
+    examDate,
+  } = await req.json();
   console.log(email, password);
   try {
     // Initialize Clerk SDK
@@ -43,7 +59,18 @@ export async function POST(req, res) {
         name: `${newUser.firstName} ${newUser.lastName}`,
         imageUrl: newUser.imageUrl,
         email: newUser.emailAddresses[0].emailAddress,
-        role: 'student',
+        role: "student",
+        rollNumber,
+        teacherEmailId,
+        address,
+        cityName,
+        country,
+        zipCode: parseInt(zipCode),
+        phone: parseInt(phone),
+        center,
+        joiningDate,
+        expiryDate,
+        examDate,
       },
     });
 

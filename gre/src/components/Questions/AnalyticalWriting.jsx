@@ -1,21 +1,38 @@
 // pages/analytical-writing.js
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from "@/components/ui/textarea"
 import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
 import { useCurrentSession } from '@/providers/CurrentSessionContext';
 
-const AnalyticalWritingPage = ({NextQuestion}) => {
-  const {setCurrentQuestion} = useCurrentQuestion();
-  const {currentSession} = useCurrentSession();
+const AnalyticalWritingPage = ({ NextQuestion }) => {
+  const { setCurrentQuestion, setSelectedChoices, selectedChoices, previousLength, currentQuestion, currentSection, resume } = useCurrentQuestion();
+  const { currentSession } = useCurrentSession();
   const handleSubmitEssay = (essay) => {
     // Handle submission logic here
     console.log('Submitted Essay:', essay);
     setCurrentQuestion(3);
     NextQuestion();
   };
+
+  useEffect(() => {
+    /* if (resume && currentSession && Array.isArray(currentSession.sessionAnswers[previousLength + currentQuestion])) {
+        setSelectedChoices(currentSession.sessionAnswers[previousLength + currentQuestion + 1]);
+        return
+    } */
+    // When the component mounts, check if there are selected choices for the current question in the session data
+    if (currentSession && Array.isArray(currentSession.sessionAnswers[previousLength + currentQuestion])) {
+      if (resume) {
+        console.log("entered", currentSession.sessionAnswers[previousLength + currentQuestion + 1]);
+        setSelectedChoices(currentSession.sessionAnswers[previousLength + currentQuestion + 1]);
+        return
+      }
+      setSelectedChoices(currentSession.sessionAnswers[previousLength + currentQuestion]);
+      console.log(currentSession.sessionAnswers[previousLength + currentQuestion])
+    }
+  }, [currentSession, previousLength, currentQuestion, setSelectedChoices]);
 
   return (
     <div className="container mx-auto p-4">
@@ -45,7 +62,10 @@ const AnalyticalWritingPage = ({NextQuestion}) => {
           </CardDescription>
 
           <div className="mt-4 w-[90%] rounded-2xl">
-            <Textarea placeholder="Write your essay here..." rows={10} className="rounded-2xl h-[500px]" />
+            <Textarea placeholder="Write your essay here..." rows={10} className="rounded-2xl h-[500px]" value={selectedChoices[0] || ""}
+              onChange={(e) => {
+                setSelectedChoices([e.target.value]);
+              }} />
           </div>
 
           <div className="flex justify-end mt-4">

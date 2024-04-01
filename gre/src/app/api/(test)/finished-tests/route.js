@@ -41,6 +41,11 @@ export async function GET(req, res) {
                 questionType: true,
               }
             },
+            dataInterpretationQuestions: {
+              include: {
+                questionType: true,
+              }
+            },
           },
         },
       },

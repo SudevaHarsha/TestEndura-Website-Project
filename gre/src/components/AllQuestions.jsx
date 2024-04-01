@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { useCurrentSession } from '@/providers/CurrentSessionContext';
 import testQuestions from '@/lib/test-questions';
+import DataInterpretationQuestions from './Questions/DataInterpretationQuestions';
 
 const AllQuestions = ({ questions, testSession, previousSectionsLengths }) => {
 
@@ -20,7 +21,7 @@ const AllQuestions = ({ questions, testSession, previousSectionsLengths }) => {
   const { currentQuestion, setCurrentQuestion, currentSection, setCurrentSection, nextQuestion, selectedChoices, setSelectedChoices, setPreviousLength, result } = useCurrentQuestion();
   console.log("question", currentQuestion);
   const { currentSession, setCurrentSession } = useCurrentSession();
-  console.log(questions);
+  console.log(questions,questions.length);
 
   const previousLength = previousSectionsLengths.reduce((sum, current) => sum + current, 0);
   setPreviousLength(previousLength);
@@ -105,7 +106,7 @@ const AllQuestions = ({ questions, testSession, previousSectionsLengths }) => {
   }
 
   const NextQuestion = () => {
-    if (currentSection === currentSession.test.sections[currentSession.test.sections.length - 1]) {
+    if (currentSection === currentSession.test.sections[currentSession.test.sections.length - 1] && currentQuestion === questions.length - 1) {
       console.log("entered");
       setCurrentSection(currentSession.test.sections[0]);
       setCurrentQuestion(0);
@@ -115,6 +116,8 @@ const AllQuestions = ({ questions, testSession, previousSectionsLengths }) => {
     }
     currentQuestion < questions.length - 1 ? StoreQuestion() : handleNext()
   };
+
+  console.log(currentQuestion);
 
   return <>
     {questions.map((question, index) => {
@@ -132,6 +135,8 @@ const AllQuestions = ({ questions, testSession, previousSectionsLengths }) => {
           return <ReadingCompehension key={index} question={question} NextQuestion={NextQuestion} />;
         } else if (question.questionType.type === "AnalyticalWriting") {
           return <AnalyticalWriting key={index} question={question} NextQuestion={NextQuestion} />;
+        } else if (question.questionType.type === "DataInterpretation") {
+          return <DataInterpretationQuestions key={index} question={question} NextQuestion={NextQuestion} />;
         }
       }
 

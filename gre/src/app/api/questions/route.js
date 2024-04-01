@@ -29,7 +29,8 @@ export async function POST(req, res) {
     units,
     correctNumeric,
     description,
-    ImageUrl
+    ImageUrl,
+    optionType
   } = await req.json();
   try {
     console.log(
@@ -56,7 +57,8 @@ export async function POST(req, res) {
       units,
       correctNumeric,
       description,
-      ImageUrl
+      ImageUrl,
+      optionType
     );
     /*   const newQuestion = await db.question.create({
       data: {
@@ -140,6 +142,25 @@ export async function POST(req, res) {
           description,
           numberOfBlanks,
           blankOptions,
+          numerator:parseInt(numerator),
+          denominator:parseInt(denominator),
+          units,
+          correctNumeric: parseInt(correctNumeric)
+        },
+      });
+    }
+    if (questionTypes.find((Qtype) => Qtype.id === typeId)?.type === "DataInterpretation" || questionTypes.find((Qtype) => Qtype.id === typeId)?.type === "TextCompletion") {
+      const newQuestion = await db.DataInterpretationQuestion.create({
+        data: {
+          testId,
+          typeId,
+          questionText,
+          options,
+          correctAnswer,
+          optionType,
+          section,
+          description,
+          images: ImageUrl,
           numerator:parseInt(numerator),
           denominator:parseInt(denominator),
           units,

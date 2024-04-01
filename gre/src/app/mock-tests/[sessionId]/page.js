@@ -208,6 +208,11 @@ const TestPage = async (sessionId) => {
               questionType: true,
             }
           },
+          dataInterpretationQuestions: {
+            include: {
+              questionType: true,
+            }
+          },
         },
       },
     },
@@ -242,7 +247,7 @@ const TestPage = async (sessionId) => {
 
   console.log(testSession)
 
-  const questions = [...testSession.test.Questions,...testSession.test.analyticalWritingQuestions,...testSession.test.quantitativeQuestions,...testSession.test.readingComprehensionQuestions,...testSession.test.multipleAnswerQuestions,...testSession.test.multipleChoiceQuestions];
+  const questions = [...testSession.test.Questions,...testSession.test.analyticalWritingQuestions,...testSession.test.quantitativeQuestions,...testSession.test.readingComprehensionQuestions,...testSession.test.multipleAnswerQuestions,...testSession.test.multipleChoiceQuestions,...testSession.test.dataInterpretationQuestions];
 
   const sections = testSession.test.sections.reduce((acc, section) => {
     const sectionQuestions = questions.filter(

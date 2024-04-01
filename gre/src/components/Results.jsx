@@ -14,6 +14,7 @@ import QuantitativeQuestions from './Questions/QuantitativeQuestions';
 import ReadingCompehension from './Questions/ReadingComprehension';
 import AnalyticalWriting from './Questions/AnalyticalWriting';
 import { Button } from './ui/button';
+import DataInterpretationQuestions from './Questions/DataInterpretationQuestions';
 
 const ResultsPage = () => {
   // Sample data for available tests
@@ -279,6 +280,19 @@ const ResultsPage = () => {
             } else if (question.questionType.type === "AnalyticalWriting") {
               return <>
                 <AnalyticalWriting key={index} question={question} NextQuestion={NextQuestion} />
+                <div className="mb-4">
+                  <p>Correct Answer: {question.correctAnswer.join(',')}</p>
+                  <p>Your Answer: {currentSession.sessionAnswers[currentResultQuestion].join(',')}</p>
+                </div>
+
+                <div>
+                  <h1>Description :</h1>
+                  <p className='ml-6'>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iste doloremque pariatur, aliquam adipisci omnis fugiat blanditiis tempora minus aut odio soluta commodi, velit consequuntur non obcaecati labore natus eligendi ex!</p>
+                </div>
+              </>;
+            } else if (question.questionType.type === "DataInterpretation") {
+              return <>
+                <DataInterpretationQuestions key={index} question={question} NextQuestion={NextQuestion} />
                 <div className="mb-4">
                   <p>Correct Answer: {question.correctAnswer.join(',')}</p>
                   <p>Your Answer: {currentSession.sessionAnswers[currentResultQuestion].join(',')}</p>

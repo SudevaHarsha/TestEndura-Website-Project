@@ -12,6 +12,7 @@ export async function GET(req, res) {
       db.readingComprehensionQuestion.findMany(),
       db.quantitativeQuestion.findMany(),
       db.analyticalWritingQuestion.findMany(),
+      db.dataInterpretationQuestion.findMany(),
     ]);
     
     const allQuestions = [
@@ -20,6 +21,7 @@ export async function GET(req, res) {
       ...Questions[2],
       ...Questions[3],
       ...Questions[4],
+      ...Questions[5],
     ];
 
     console.log('Questions divided into sections:', allQuestions);

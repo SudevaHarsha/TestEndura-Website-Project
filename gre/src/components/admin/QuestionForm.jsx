@@ -34,6 +34,8 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
     denominator: 0,
     units: '',
     correctNumeric: 0,
+    noOfImages: 0,
+    optionType: '',
   });
   const { edited } = useCurrentQuestion();
 
@@ -83,30 +85,30 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
         console.error('Error fetching question types:', error);
       }
     }; */
-    
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-    
-      // 2. get reference to the input element
-      const input = ref.current;
-    
-      // 3. build form data
-      const formData = new FormData();
-      const files = Array.from(input.files ?? []);
-      for (const file of files) {
-        formData.append(file.name, file);
-      }
-    
-      // 4. use axios to send the FormData
 
-      await axios.post("/api/upload", formData);
-      setUrls(files.map((file) => `/api/uploads/${file.name}`));
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        ImageUrl: [...prevFormData.ImageUrl, ...files.map((file) => `/api/uploads/${file.name}`)],
-      }));
-    };
-    
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // 2. get reference to the input element
+    const input = ref.current;
+
+    // 3. build form data
+    const formData = new FormData();
+    const files = Array.from(input.files ?? []);
+    for (const file of files) {
+      formData.append(file.name, file);
+    }
+
+    // 4. use axios to send the FormData
+
+    await axios.post("/api/upload", formData);
+    setUrls(files.map((file) => `/api/uploads/${file.name}`));
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      ImageUrl: [...prevFormData.ImageUrl, ...files.map((file) => `/api/uploads/${file.name}`)],
+    }));
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === 'checkbox' || type === 'radio' ? (type === 'checkbox' ? checked : value === 'true') : value;
@@ -250,7 +252,8 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
         denominator: 0,
         units: '',
         correctNumeric: 0,
-
+        noOfImages: 0,
+        optionType: '',
       });
     } catch (error) {
       console.error('Error creating question:', error);
@@ -333,7 +336,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
         />
       </label>
-      {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'Blank' && (
+      {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'MultipleAnswerQuestion' && (
         <div className="mb-4">
           <label className="block mb-2 font-bold">Blank Type:</label>
           <select
@@ -350,7 +353,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           </select>
         </div>
       )}
-      {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'Blank' && formData.blankType === 'normal' && (
+      {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'MultipleAnswerQuestion' && formData.blankType === 'normal' && (
         <>
           <label className="block mb-4">
             Number of Blanks:
@@ -366,7 +369,24 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           {renderBlankOptionsInputs()}
         </>
       )}
-      {!formData.select && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type != 'AnalyticalWriting' && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type != 'Blank' && <label className="block mb-4">
+      {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'DataInterpretation' && (
+        <>
+          <label className="block mb-2 font-bold">Option Type:</label>
+          <select
+            name="optionType"
+            value={formData.optionType}
+            onChange={handleChange}
+            className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md"
+          >
+            <option value="">Select Blank Type</option>
+            <option value="normal">Normal</option>
+            <option value="numeric">Numeric</option>
+            <option value="numeric units">Numeric Units</option>
+            <option value="fraction">Fraction</option>
+          </select>
+        </>
+      )}
+      {!formData.select && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type != 'AnalyticalWriting' && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type != 'MultipleAnswerQuestion' && formData.optionType === 'normal' && <label className="block mb-4">
         Number of Options:
         <input
           type="number"
@@ -463,7 +483,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           />
         </label>
       )}
-      {(questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'MCQ' || questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'Quantitative') && (
+      {(questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'MCQ' || questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'Quantitative') || questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'DataInterpretation' && (
         <div className="mb-4">
           <label className="block mb-2 font-bold">Image:</label>
           <input
@@ -476,31 +496,31 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
       )}
       {
         formData.image && <>
-        <form onSubmit={handleSubmit}>
-          <input type="file" name="files" ref={ref} multiple />
-          <button
-            type="submit"
-            className="px-2 py-1 rounded-md bg-violet-50 text-violet-500"
-          >
-            Upload
-          </button>
-        </form>
-        {/* display uploaded images */}
-        <div className="relative aspect-video max-h-[400px]">
-          {urls.map((url) => {
-            console.log(url);
-            return (
-              <Image
-                key={url}
-                src={url}
-                alt={url}
-                className="object-cover"
-                fill
-              />
-            );
-          })}
-        </div>
-      </>
+          <form onSubmit={handleSubmit}>
+            <input type="file" name="files" ref={ref} multiple />
+            <button
+              type="submit"
+              className="px-2 py-1 rounded-md bg-violet-50 text-violet-500"
+            >
+              Upload
+            </button>
+          </form>
+          {/* display uploaded images */}
+          <div className="relative aspect-video max-h-[400px]">
+            {urls.map((url) => {
+              console.log(url);
+              return (
+                <Image
+                  key={url}
+                  src={url}
+                  alt={url}
+                  className="object-cover"
+                  fill
+                />
+              );
+            })}
+          </div>
+        </>
       }
       {/* {
         formData.image && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'Quantitative' && <>
@@ -574,7 +594,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           />
         </label>
       )}
-      {formData.blankType === 'fraction' && (
+      {(formData.blankType === 'fraction' || formData.optionType === 'fraction') && (
         <div className="mb-4">
           <label className="block mb-2 font-bold">Correct Answer (Numerator):</label>
           <input
@@ -586,7 +606,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           />
         </div>
       )}
-      {formData.blankType === 'fraction' && (
+      {(formData.blankType === 'fraction' || formData.optionType === 'fraction') && (
         <div className="mb-4">
           <label className="block mb-2 font-bold">Correct Answer (Denominator):</label>
           <input
@@ -598,7 +618,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           />
         </div>
       )}
-      {(formData.blankType === 'numeric' || formData.blankType === "numeric units") && (
+      {(formData.blankType === 'numeric' || formData.blankType === "numeric units" || formData.optionType === 'numeric' || formData.optionType === "numeric units") && (
         <div className="mb-4">
           <label className="block mb-2 font-bold">Correct Answer :</label>
           <input
@@ -610,7 +630,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           />
         </div>
       )}
-      {formData.blankType === 'numeric units' && (
+      {(formData.blankType === 'numeric units' || formData.optionType === 'numeric units') && (
         <div className="mb-4">
           <label className="block mb-2 font-bold">units :</label>
           <input
@@ -622,6 +642,45 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           />
         </div>
       )}
+      {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'DataInterpretation' && (
+        <label className="block mb-4">
+          Number of Images:
+          <input
+            type="number"
+            name="noOfImages"
+            value={formData.noOfImages}
+            onChange={handleChange}
+            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </label>
+      )}
+
+      {/* {formData.noOfImages > 0 && Array.from({ length: formData.noOfImages }, () => 0).map((image, index) => (
+        <div key={index}>
+          <form onSubmit={handleSubmit}>
+            <input type="file" name="files" ref={ref} multiple />
+            <button
+              type="submit"
+              className="px-2 py-1 rounded-md bg-violet-50 text-violet-500"
+            >
+              Upload
+            </button>
+          </form>
+          <div className="relative aspect-video max-h-[400px]">
+            {urls.map((url) => {
+              console.log(url);
+              return <Image
+                key={url}
+                src={url}
+                alt={url}
+                className="object-cover"
+                fill
+              />
+            })}
+          </div>
+        </div>
+      ))} */}
+
       <label className="block mb-4">
         Description:
         <textarea
