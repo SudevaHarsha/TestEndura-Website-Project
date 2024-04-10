@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react";
-import Slider from "./Slider";
+import TestimonialSlider from "./TestimonialSlider";
 
 const testimonials = [
     {
@@ -40,7 +40,7 @@ const testimonials = [
 const TestimonialsPage = () => {
   return (
     <div className="container mx-auto px-4">
-      <Slider testimonials={testimonials} />
+      <TestimonialSlider testimonials={testimonials} />
     </div>
   );
 };

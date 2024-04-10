@@ -15,7 +15,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
 import { Button } from '@/components/ui/button';
 
-const Slider = () => {
+const TestimonialSlider = () => {
   const [swiper, setSwiper] = useState(null)
   const [showNavigation, setShowNavigation] = useState(false)
 
@@ -67,4 +67,4 @@ const Slider = () => {
   )
 }
 
-export default Slider
+export default TestimonialSlider
