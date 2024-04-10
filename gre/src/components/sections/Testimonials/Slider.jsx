@@ -12,9 +12,6 @@ import 'swiper/css/scrollbar';
 
 import { Swiper, SwiperSlide } from 'swiper/react'
 
-import { images } from '@/lib/images'
-import { cn } from '@/lib/utils'
-
 import 'swiper/css'
 import { Button } from '@/components/ui/button';
 
