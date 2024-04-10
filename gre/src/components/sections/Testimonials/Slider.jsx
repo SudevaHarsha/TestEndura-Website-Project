@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils'
 import 'swiper/css'
 import { Button } from '@/components/ui/button';
 
-export default function Page() {
+const Slider = () => {
   const [swiper, setSwiper] = useState(null)
   const [showNavigation, setShowNavigation] = useState(false)
 
@@ -69,3 +69,5 @@ export default function Page() {
     </section>
   )
 }
+
+export default Slider
