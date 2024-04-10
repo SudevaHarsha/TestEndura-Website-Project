@@ -15,7 +15,7 @@ function Footer() {
 						<p className="text-gray-800 font-bold text-3xl pb-6">
 							Stream<span className="text-blue-600">line</span>
 						</p>
-						<div className="flex gap-6 pb-5">
+						<div className="flex gap-6 sm:pb-5">
 							<FaInstagram className="text-2xl cursor-pointer hover:text-yellow-600" />
 							<FaTwitter className="text-2xl cursor-pointer hover:text-blue-600" />
 							<FaLinkedin className="text-2xl cursor-pointer hover:text-blue-600" />

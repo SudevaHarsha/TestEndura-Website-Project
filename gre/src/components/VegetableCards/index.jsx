@@ -24,7 +24,7 @@ const VegetableCards = () => {
   }, []);
 
   return (
-    <div className="container mx-auto py-8 grid grid-cols-3 gap-4">
+    <div className="container sm:mx-auto mt-4 sm:py-8 py-0 px-0 grid sm:grid-cols-3 grid-cols-1 gap-4">
       {tests.map((test, index) => (
         <TestCard key={index} test={test} index={index} />
       ))}

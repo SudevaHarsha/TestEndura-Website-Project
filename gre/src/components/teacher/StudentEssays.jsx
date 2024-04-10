@@ -7,7 +7,7 @@ import Link from 'next/navigation'
 import AnalyticalWritingPage from '../Questions/AnalyticalWriting';
 import { Textarea } from '../ui/textarea';
 
-const StudentEssays = ({ student, setTeacherView }) => {
+const StudentEssays = ({ student, setTeacherView, testId }) => {
 
     const [essays, setEssays] = useState([]);
     const [essay, setEssay] = useState([]);
@@ -42,7 +42,7 @@ const StudentEssays = ({ student, setTeacherView }) => {
     return <>
         {!evaluate && <div className='w-full flex flex-col items-center'>
             <div className='flex flex-wrap'>
-                {essays.map((essay, index) => {
+                {essays.filter((essay)=>essay.testId === testId).map((essay, index) => {
                     return <div key={index} className="h-auto max-w-md w-80 mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl mb-7">
                         <div className="md:flex">
                             <div className="p-8">
@@ -94,16 +94,6 @@ const StudentEssays = ({ student, setTeacherView }) => {
                     <div className="w-[90%]">
                         <div className='border-b-2 mb-2 pb-1'>
                             <strong>Prompt:</strong> {essay?.test?.analyticalWritingQuestions[0]?.prompt}
-                        </div>
-                        <div>
-                            <em>Argument:</em> The following appeared in a memo from the director of a large group of hospitals.
-                            "In a controlled laboratory study of liquid hand soaps, a concentrated solution of extra strength
-                            UltraClean hand soap produced a 40 percent greater reduction in harmful bacteria than did the liquid hand
-                            soaps currently used in our hospitals. During our recent test of regular-strength UltraClean with doctors,
-                            nurses, and visitors at our hospital in Worktown, the hospital reported significantly fewer cases of patient
-                            infection (a 20 percent reduction) than did any of the other hospitals in our group. Therefore, to prevent
-                            serious patient infections, we should supply UltraClean at all hand-washing stations throughout our
-                            hospital system."
                         </div>
                     </div>
 

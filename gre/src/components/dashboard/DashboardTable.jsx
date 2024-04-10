@@ -10,6 +10,9 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
     const [questions, setQuestions] = useState([]);
     const [types, setTypes] = useState([]);
     const [tests, setTests] = useState([]);
+    const [selectedFilter, setSelectedFilter] = useState();
+    
+    const [filteredQuestions, setFilteredQuestions] = useState([]);
 
     const { setEdited } = useCurrentQuestion();
 
@@ -20,6 +23,7 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
                 const types = await axios.get("/api/find-type");
                 const tests = await axios.get("/api/find-test");
                 setQuestions(response.data.allQuestions);
+                setFilteredQuestions(response.data.allQuestions);
                 setTypes(types.data.questionTypes);
                 setTests(tests.data.tests);
                 console.log("Dashboard", response.data.allQuestions);
@@ -55,7 +59,53 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
         console.log("set");
     }
 
-    const DashboardHeadings = ['Id', 'Subject Name', 'Question', 'Topic', 'Type', 'Points'];
+    const handleTypeFilterChange = (event) => {
+        setSelectedFilter(event.target.value === 'all' ? null : event.target.value);
+        console.log('type', event.target.value);
+        if (event.target.value != 'all') {
+            const filteredData = questions.filter((question) => question.typeId === event.target.value);
+            setFilteredQuestions([...filteredData]);
+            console.log(filteredQuestions);
+        }
+        if (event.target.value === 'all') {
+            setFilteredQuestions([...questions]);
+        }
+    };
+    const handleTestFilterChange = (event) => {
+        setSelectedFilter(event.target.value === 'all' ? null : event.target.value);
+        console.log('type', event.target.value);
+        if (event.target.value != 'all') {
+            const filteredData = questions.filter((question) => question.testId === event.target.value);
+            setFilteredQuestions([...filteredData]);
+            console.log(filteredQuestions);
+        }
+        if (event.target.value === 'all') {
+            setFilteredQuestions([...questions]);
+        }
+    };
+    let subjects = [];
+    subjects = questions.map((question) => question.subject);
+    const uniqueSubjects = subjects.reduce((accumulator, currentValue) => {
+        if (!accumulator.includes(currentValue)) {
+            accumulator.push(currentValue);
+        }
+        return accumulator;
+    }, []);
+    console.log(uniqueSubjects);
+
+    const handleSubjectFilterChange = (event) => {
+        setSelectedFilter(event.target.value === 'all' ? null : event.target.value);
+        if (event.target.value != 'all') {
+            const filteredData = questions.filter((question) => question.subject === event.target.value);
+            setFilteredQuestions([...filteredData]);
+            console.log(filteredQuestions);
+        }
+        if (event.target.value === 'all') {
+            setFilteredQuestions([...questions]);
+        }
+    }
+
+    const DashboardHeadings = ['Id', 'test', 'Subject', 'Question', 'Topic', 'Type', 'Points'];
     const UserHeadings = ['Id', 'User', 'Assigned', 'Role'];
     const QuestionTypesHeadings = ['Id', 'Type'];
     const TestHeadings = ['Id', 'Name', 'Description', 'Overall Duration', 'Sections'];
@@ -66,8 +116,10 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
         setNavState('newStudent')
     }
 
+
+
     return (
-        <div className='w-full'>
+        <div className='w-[85%]'>
             <div className="mt-4">
                 <div className="flex flex-wrap -mx-6">
                     <div className="w-full px-6 sm:w-1/2 xl:w-1/3">
@@ -106,7 +158,7 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
                                 </svg>
                             </div>
                             <div className="mx-5">
-                                <h4 className="text-2xl font-semibold text-gray-700">8,282</h4>
+                                <h4 className="text-2xl font-semibold text-gray-700">{users.length}</h4>
                                 <div className="text-gray-500">New Users</div>
                             </div>
                         </div>
@@ -138,7 +190,7 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
 
                             <div className="mx-5">
                                 <h4 className="text-2xl font-semibold text-gray-700">
-                                    200,521
+                                    {questions.length}
                                 </h4>
                                 <div className="text-gray-500">Total Questions</div>
                             </div>
@@ -171,9 +223,9 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
 
                             <div className="mx-5">
                                 <h4 className="text-2xl font-semibold text-gray-700">
-                                    215,542
+                                    {tests.length}
                                 </h4>
-                                <div className="text-gray-500">Available Products</div>
+                                <div className="text-gray-500">Available Tests</div>
                             </div>
                         </div>
                     </div>
@@ -194,28 +246,68 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
                                 <tr>
                                     {navState === 'dashboard' &&
                                         DashboardHeadings.map((heading) => {
-                                            return <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                                {heading}
-                                            </th>
+                                            if (heading != 'Type' && heading != 'Subject' && heading != 'test') {
+                                                return <th key={heading} className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                                                    {heading}
+                                                </th>
+                                            }
+                                            if (heading === 'Type') {
+                                                return <th className='p-0 m-0' key={heading}>
+                                                    <select id="typeFilter" className='font-normal bg-gray-50' onChange={handleTypeFilterChange}>
+                                                        <option value="all">Type</option>
+                                                        {types.map((type) => (
+                                                            <option key={type.id} value={type.id}>
+                                                                {type.type}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </th>
+                                            }
+                                            console.log(heading === 'Subject');
+                                            if (heading === 'Subject') {
+                                                console.log('subject');
+                                                return <th className='p-0 m-0' key={heading}>
+                                                    <select id="testFilter" className='bg-gray-50 font-normal' onChange={handleSubjectFilterChange}>
+                                                        <option value="all">Subject</option>
+                                                        {uniqueSubjects.map((subject) => (
+                                                            <option key={subject} value={subject}>
+                                                                {subject}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </th>
+                                            }
+                                            if (heading === 'test') {
+                                                return <th className='p-0 m-0' key={heading}>
+                                                    <select id="testFilter" className='bg-gray-50 font-normal' onChange={handleTestFilterChange}>
+                                                        <option value="all">Test</option>
+                                                        {tests?.map((test) => (
+                                                            <option key={test.id} value={test.id}>
+                                                                {test.name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </th>
+                                            }
                                         })
                                     }
                                     {navState === 'users' &&
                                         UserHeadings.map((heading) => {
-                                            return <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                                            return <th key={heading} className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                                                 {heading}
                                             </th>
                                         })
                                     }
                                     {navState === 'question types' &&
                                         QuestionTypesHeadings.map((heading) => {
-                                            return <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                                            return <th key={heading} className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                                                 {heading}
                                             </th>
                                         })
                                     }
                                     {navState === 'tests' &&
                                         TestHeadings.map((heading) => {
-                                            return <th className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+                                            return <th key={heading} className="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                                                 {heading}
                                             </th>
                                         })
@@ -227,8 +319,8 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
 
                             <tbody className="bg-white">
                                 {
-                                    navState === 'dashboard' && questions && questions.map((question) => {
-                                        return <tr>
+                                    navState === 'dashboard' && questions && filteredQuestions && filteredQuestions.map((question) => {
+                                        return <tr key={question.id}>
                                             <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
                                                 <div>
                                                     {getLastFourDigits(question.id)}
@@ -236,31 +328,14 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
                                             </td>
                                             <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
                                                 <div>
-                                                    {tests.find((test) => test.id === question.testId).name}
+                                                    {tests.find((test) => test.id === question.testId)?.name}
                                                 </div>
                                             </td>
-
-                                            {/* <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
-                                                <div className="flex items-center">
-                                                    <div className="flex-shrink-0 h-10 w-10">
-                                                        <img
-                                                            className="h-10 w-10 rounded-full"
-                                                            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                                                            alt=""
-                                                        />
-                                                    </div>
-
-                                                    <div className="ml-4">
-                                                        <div className="text-sm leading-5 font-medium text-gray-900">
-                                                            John Doe
-                                                        </div>
-                                                        <div className="text-sm leading-5 text-gray-500">
-                                                            john@example.com
-                                                        </div>
-                                                    </div>
+                                            <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                                <div>
+                                                    {question?.subject ? question?.subject : "no"}
                                                 </div>
-                                            </td> */}
-
+                                            </td>
                                             <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
                                                 {question.questionText}
                                             </td>
@@ -276,7 +351,7 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
                                             </td>
                                             <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
                                                 <div>
-                                                    1.5
+                                                    {question?.marks ? question.marks : 1.5}
                                                 </div>
                                             </td>
                                             {/* <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
@@ -311,7 +386,7 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
                                 }
                                 {
                                     navState === 'users' && users && users.map((user) => {
-                                        return <tr>
+                                        return <tr key={user.id}>
                                             <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
                                                 {user.id}
                                             </td>
@@ -364,7 +439,7 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
                                 }
                                 {
                                     navState === 'question types' && types && types.map((type) => {
-                                        return <tr>
+                                        return <tr key={type.id}>
                                             <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
                                                 {type.id}
                                             </td>
@@ -392,7 +467,7 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
                                 }
                                 {
                                     navState === 'tests' && tests && tests.map((test) => {
-                                        return <tr>
+                                        return <tr key={test.id}>
                                             <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
                                                 {test.id}
                                             </td>
@@ -404,7 +479,7 @@ const DashboardTable = ({ users, setNavState, navState, setQuestionId, setTypeId
                                             </td>
                                             <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500">
                                                 {test.sections.map((section, index) => {
-                                                    return <div className='flex gap-3 text-justify'>
+                                                    return <div key={index} className='flex gap-3 text-justify'>
                                                         <div className='text-justify w-40'>{section}</div>
                                                         <div>{test.sectionDuration[index]} mins</div>
                                                     </div>

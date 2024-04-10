@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import React, { useState } from 'react'
 import qs from "query-string";
 import { Button } from '../ui/button'
 import { ChevronRight, ChevronLeft } from "lucide-react";
@@ -13,7 +13,7 @@ import axios from 'axios';
 import { db } from '@/lib/db';
 import { useCurrentSession } from '@/providers/CurrentSessionContext';
 
-const QuestionsNav = ({ questionLength, test, testSession }) => {
+const QuestionsNav = ({ questionLength, test, testSession, handleNext, NextQuestion }) => {
 
     const router = useRouter();
 
@@ -24,12 +24,12 @@ const QuestionsNav = ({ questionLength, test, testSession }) => {
     const currentTime = new Date();
     const endTime = new Date(currentTime.getTime() + "30" * 60000);
 
-    const { currentQuestion, setCurrentQuestion, nextQuestion, currentSection } = useCurrentQuestion();
+    const { currentQuestion, setCurrentQuestion, setReview, currentSection, setExitSection, setHelp, markQuestions, setMarkQuestions } = useCurrentQuestion();
     const { currentSession } = useCurrentSession();
     /* const {sessionStarted, sessionExpired, minutes, seconds, resetTimer, duration} = useTimer(); */
 
     const PreviousQuestion = () => {
-        console.log("prec=vious");
+        console.log("previous");
         currentQuestion != 0 ? setCurrentQuestion(currentQuestion - 1) : currentQuestion
     };
 
@@ -69,8 +69,20 @@ const QuestionsNav = ({ questionLength, test, testSession }) => {
         })
     } */
 
-    return (
-        <div className="w-[100%] flex justify-between p-6 pb-0">
+    const handleExitSection = () => {
+        setExitSection(true);
+    }
+
+    const handleHelpSection = () => {
+        setHelp(true);
+    }
+
+    const handleMark = () => {
+        setMarkQuestions([...markQuestions, currentQuestion])
+    }
+
+    return <>
+        <div className="w-[100%] sm:flex justify-between p-6 pb-0 hidden">
             <div className="flex flex-col">
                 {/* topic */}
                 <p>
@@ -88,24 +100,69 @@ const QuestionsNav = ({ questionLength, test, testSession }) => {
                 Question <span className='font-bold'>{currentQuestion + 1}</span> <span>{"/" + questionLength}</span>
             </div>
             <div className='flex gap-6'>
-                <div>
+                <div className=' flex gap-4'>
                     <div className="text center">
-                        <Button className="h-11 w-20 text-white bg-strong hover:bg-strong/90 px-3 my-auto text-center">Help</Button>
+                        <Button className="h-11 w-20 text-white bg-strong hover:bg-strong/90 px-3 my-auto text-center" onClick={handleHelpSection}>Help</Button>
+                    </div>
+                    <div className="text center">
+                        <Button className="h-11 w-20 text-white bg-secondary hover:bg-secondary/90 px-3 my-auto text-center" onClick={handleMark}>Mark</Button>
+                    </div>
+                    <div className="text center">
+                        <Button className="h-11 w-20 text-white bg-secondary hover:bg-secondary/90 px-3 my-auto text-center" onClick={() => setReview(true)}>Review</Button>
                     </div>
                 </div>
                 <div className='flex gap-4'>
                     <div className="text center">
-                        <Button onClick={PreviousQuestion} className="h-11 text-white bg-strong hover:bg-strong/90 px-3 my-auto text-center"><ChevronLeft className="w-4 h-4 mr-2 text-white" /> previous</Button>
+                        <Button onClick={handleExitSection} className="h-11 text-white bg-red-600 hover:bg-red-600/90 px-3 my-auto text-center"> Exit Section</Button>
                     </div>
                     <div className="text center">
                         <Button onClick={handleExit} className="h-11 text-white bg-red-600 hover:bg-red-600/90 px-3 my-auto text-center"> Exit Test</Button>
                     </div>
+                    <div className="text center">
+                        <Button onClick={PreviousQuestion} className="h-11 text-white bg-strong hover:bg-strong/90 px-3 my-auto text-center"><ChevronLeft className="w-4 h-4 mr-2 text-white" /> previous</Button>
+                    </div>
+                    <div className="text center">
+                        <Button onClick={NextQuestion} className="h-11 text-white bg-strong hover:bg-strong/90 px-3 my-auto text-center">Next <ChevronRight className="w-4 h-4 mr-2 text-white" /></Button>
+                    </div>
                 </div>
             </div>
-
-
         </div>
-    )
+        <div className="w-[100%] flex flex-col justify-between px-4 mt-6 pb-0 sm:hidden">
+            <div className="flex items-center justify-between">
+                <div className="px-2 py-1 text-white rounded-lg bg-slate-800 text-sm">
+                    {currentSection}
+                </div>
+                <div className="flex self-start text-slate-400 items-center">
+                    <Timer className="mr-2" />
+                    <TimerClock TestDuration="30" test={test} testSession={testSession} />
+                </div>
+            </div>
+            <div className='flex justify-between items-center mt-2'>
+                <div>
+                    Question <span className='font-bold'>{currentQuestion + 1}</span> <span>{"/" + questionLength}</span>
+                </div>
+                <div className='flex justify-center items-center gap-2'>
+                    <div className="text center">
+                        <Button className="h-8 w-15 text-sm/4 rounded-[8px] text-white bg-strong hover:bg-strong/90 px-3 my-auto text-center">Help</Button>
+                    </div>
+                    <div className="text center">
+                        <Button className="h-8 w-15 text-sm/4 rounded-[8px] text-white bg-blue-600 hover:bg-blue-600/90 px-3 my-auto text-center">Mark</Button>
+                    </div>
+                    <div className="text center">
+                        <Button className="h-8 w-15 text-sm/4 rounded-[8px] text-white bg-blue-600 hover:bg-blue-600/90 px-3 my-auto text-center">Review</Button>
+                    </div>
+                </div>
+            </div>
+            <div className='flex gap-4 justify-center items-center mt-2'>
+                <div className="text center">
+                    <Button onClick={PreviousQuestion} className="h-8 w-15 text-sm rounded-[5px] text-white bg-strong hover:bg-strong/90 px-3 my-auto text-center"><ChevronLeft className="w-4 h-4 mr-2 text-white" /> previous</Button>
+                </div>
+                <div className="text center">
+                    <Button onClick={handleExit} className="h-8 w-15 text-sm rounded-[5px] text-white bg-red-600 hover:bg-red-600/90 px-3 my-auto text-center"> Exit Test</Button>
+                </div>
+            </div>
+        </div>
+    </>
 }
 
 export default QuestionsNav

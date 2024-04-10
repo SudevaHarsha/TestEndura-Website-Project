@@ -9,7 +9,7 @@ const TimeBreak = ({ redirectTo }) => {
   const [seconds, setSeconds] = useState(15);
   const router = useRouter();
 
-  const {currentSection} = useCurrentQuestion();
+  const {currentSection,setInstructions,instructions} = useCurrentQuestion();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -21,11 +21,16 @@ const TimeBreak = ({ redirectTo }) => {
 
   useEffect(() => {
     if (seconds === 0) {
+      setInstructions(instructions+1);
       router.push(redirectTo);
     }
   }, [seconds, redirectTo, router]);
 
   const handleSkipBreak = () => {
+   /*  const sectionKeys = Object.keys(questions);
+    const currentIndex = sectionKeys.indexOf(currentSection);
+    setCurrentSection(sectionKeys[currentIndex + 1]); */
+    setInstructions(instructions+1);
     router.push(redirectTo);
   }
 

@@ -97,7 +97,8 @@ export async function PATCH(req, {params}) {
     denominator,
     units,
     correctNumeric,
-    description
+    description,
+    marks
   } = await req.json();
   try {
     console.log(
@@ -123,7 +124,8 @@ export async function PATCH(req, {params}) {
       denominator,
       units,
       correctNumeric,
-      description
+      description,
+      marks
     );
 
     let editedQuestion = {};
@@ -149,6 +151,7 @@ export async function PATCH(req, {params}) {
           questionText,
           section,
           description,
+          marks:parseInt(marks),
           prompt,
         },
       });
@@ -177,6 +180,7 @@ export async function PATCH(req, {params}) {
           highlighted,
           section,
           description,
+          marks:parseInt(marks),
           paragraph,
           highlightedSentence,
         },
@@ -196,6 +200,7 @@ export async function PATCH(req, {params}) {
           blankType,
           section,
           description,
+          marks:parseInt(marks),
           numberOfBlanks,
           blankOptions,
           numerator:parseInt(numerator),
@@ -220,6 +225,7 @@ export async function PATCH(req, {params}) {
           image,
           section,
           description,
+          marks:parseInt(marks),
         },
       });
     }
@@ -240,8 +246,35 @@ export async function PATCH(req, {params}) {
           correctAnswer,
           section,
           description,
+          marks:parseInt(marks),
           Quantity1,
           Quantity2,
+        },
+      });
+    }
+    if (
+      questionTypes.find((Qtype) => Qtype.id === typeId)?.type ===
+      "DataInterpretation"
+    ) {
+      const editedQuestion = await db.DataInterpretationQuestion.update({
+        where : {
+          id:params.questionId
+        },
+        data: {
+          testId,
+          typeId,
+          questionText,
+          options,
+          correctAnswer,
+          optionType,
+          section,
+          description,
+          marks:parseInt(marks),
+          images: ImageUrl,
+          numerator:parseInt(numerator),
+          denominator:parseInt(denominator),
+          units,
+          correctNumeric: parseInt(correctNumeric)
         },
       });
     }

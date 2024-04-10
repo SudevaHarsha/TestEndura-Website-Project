@@ -12,9 +12,14 @@ export const CurrentQuestionProvider = ({ children }) => {
   const [instructions, setInstructions] = useState(0);
   const [endTime, setEndTimeState] = useState(null);
   const [selectedChoices, setSelectedChoices] = useState([]);
+  const [markQuestions, setMarkQuestions] = useState([]);
   const [result, setResult] = useState(false);
   const [resume, setResume] = useState(false);
   const [edited, setEdited] = useState(false);
+
+  const [review, setReview] = useState(false);
+  const [exitSection, setExitSection] = useState(false);
+  const [help, setHelp] = useState(false);
   // Load the currentQuestion state from local storage, default to 0 if not available
   /*   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -60,6 +65,14 @@ export const CurrentQuestionProvider = ({ children }) => {
     setResume,
     edited,
     setEdited,
+    review,
+    setReview,
+    exitSection,
+    setExitSection,
+    help,
+    setHelp,
+    markQuestions,
+    setMarkQuestions,
   };
 
   return (
@@ -89,6 +102,14 @@ export const useCurrentQuestion = () => {
     setResume,
     edited,
     setEdited,
+    review,
+    setReview,
+    exitSection,
+    setExitSection,
+    help,
+    setHelp,
+    markQuestions,
+    setMarkQuestions,
   } = useContext(CurrentQuestionContext);
 
   return {
@@ -110,5 +131,13 @@ export const useCurrentQuestion = () => {
     setResume,
     edited,
     setEdited,
+    review,
+    setReview,
+    exitSection,
+    setExitSection,
+    help,
+    setHelp,
+    markQuestions,
+    setMarkQuestions,
   };
 };

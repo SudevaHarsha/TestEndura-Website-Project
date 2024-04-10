@@ -47,6 +47,7 @@ model Test {
 
   sectionDuration String[]
   sections        String[]
+  totalAttempts   Int?
 
   testSessions                  TestSession[]
   Questions                     Question[]
@@ -105,6 +106,7 @@ model ReadingComprehensionQuestion {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   typeId          String   @db.ObjectId
   testId          String   @db.ObjectId
+  subject         String?
   correctAnswer   Int[]
   correctSentence String[]
   questionText    String
@@ -112,7 +114,7 @@ model ReadingComprehensionQuestion {
   section         String
   paragraph       String
   description     String?
-  marks           Int
+  marks           Int?
 
   highlighted         Boolean?
   select              Boolean?
@@ -127,6 +129,7 @@ model MultipleAnswerQuestion {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   typeId        String   @db.ObjectId
   testId        String   @db.ObjectId
+  subject         String?
   correctAnswer Int[]
   questionText  String
   options       String[]
@@ -150,6 +153,7 @@ model DataInterpretationQuestion {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   typeId        String   @db.ObjectId
   testId        String   @db.ObjectId
+  subject         String?
   correctAnswer Int[]
   questionText  String
   options       String[]
@@ -162,6 +166,7 @@ model DataInterpretationQuestion {
   denominator    Int?
   units          String?
   correctNumeric Int?
+  question       String?
   images         String[]
 
   test         Test         @relation(fields: [testId], references: [id], onDelete: Cascade)
@@ -172,6 +177,7 @@ model MultipleChoiceQuestion {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   typeId        String   @db.ObjectId
   testId        String   @db.ObjectId
+  subject         String?
   correctAnswer Int[]
   questionText  String
   options       String[]
@@ -191,6 +197,7 @@ model QuantitativeQuestion {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   typeId        String   @db.ObjectId
   testId        String   @db.ObjectId
+  subject         String?
   correctAnswer Int[]
   questionText  String
   options       String[]
@@ -213,6 +220,7 @@ model AnalyticalWritingQuestion {
   id            String  @id @default(auto()) @map("_id") @db.ObjectId
   typeId        String  @db.ObjectId
   testId        String  @db.ObjectId
+  subject         String?
   correctAnswer Int[]
   questionText  String
   section       String
@@ -229,6 +237,7 @@ model Question {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   typeId        String   @db.ObjectId
   testId        String   @db.ObjectId
+  subject         String?
   questionText  String
   options       String[]
   correctAnswer Int[]

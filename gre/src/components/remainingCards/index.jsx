@@ -12,13 +12,14 @@ const RemainingCards = ({ filteredSessions }) => {
   const { currentSession, setCurrentSession } = useCurrentSession();
   const { setCurrentQuestion, setCurrentSection, setResume } = useCurrentQuestion();
 
+  console.log(filteredSessions);
   const handleResumeClick = (index) => {
-    setCurrentSession(filteredSessions[index]);
-    setCurrentQuestion(filteredSessions[index].currentQuestion - 1)
-    console.log(filteredSessions[index].id)
-    setCurrentSection(filteredSessions[index].currentSection)
+    setCurrentSession(filteredSessions[filteredSessions.length - 4 + index]);
+    setCurrentQuestion(filteredSessions[filteredSessions.length - 4 + index].currentQuestion - 1)
+    console.log(filteredSessions[filteredSessions.length - 4 + index].id)
+    setCurrentSection(filteredSessions[filteredSessions.length - 4 + index].currentSection)
     setResume(true);
-    router.push(`/mock-tests/resume-test/${filteredSessions[index].id}`)
+    router.push(`/mock-tests/resume-test/${filteredSessions[filteredSessions.length - 4 + index].id}`)
   }
 
   const generatePersonalizedMessage = (sessionRemained) => {
@@ -39,13 +40,14 @@ const RemainingCards = ({ filteredSessions }) => {
   };
 
   return (
-    <div className='flex w-full flex-wrap gap-9 items-center justify-center mt-7'>
+    <div className='sm:flex sm:flex-row sm:w-full sm:flex-wrap sm:gap-9 sm:items-center sm:justify-center sm:mt-7 flex flex-col gap-6 items-center justify-center mt-7'>
       {filteredSessions.slice(-4).map((sessionRemained, index) => {
+        console.log(sessionRemained)
         const progress = (sessionRemained.currentQuestion / 20) * 100; // Assuming totalQuestions is defined somewhere
         const personalizedMessage = generatePersonalizedMessage(sessionRemained); // Function to generate personalized message
         return (
           <div key={index} onClick={() => handleResumeClick(index)}>
-            <div className={`w-[600px] h-60 rounded-lg p-6 flex justify-between text-white bg-green-200 shadow-lg mx-4 mb-8 overflow-hidden transition-all duration-300 transform hover:scale-102 hover:translate-y-[10px] hover:translate-x-[5px] hover:shadow-2xl hover:shadow-black/60`}>
+            <div className={`sm:w-[600px] sm:h-60 sm:rounded-lg sm:p-6 sm:flex sm:justify-between sm:text-white sm:bg-green-200 sm:shadow-lg sm:mx-4 sm:mb-8 overflow-hidden transition-all duration-300 transform hover:scale-102 hover:translate-y-[10px] hover:translate-x-[5px] hover:shadow-2xl hover:shadow-black/60 w-full rounded-3xl p-4 mr-4  bg-green-200 shadow-lg`}>
               <div className='pl-5 my-auto w-full'>
                 <div className='flex justify-between items-center mt-2 mb-4'>
                   <h2 className="text-2xl mt-0 font-bold text-black">{sessionRemained.test.name}</h2>
@@ -54,14 +56,14 @@ const RemainingCards = ({ filteredSessions }) => {
                 {/* <h2 className='text-black'>Hey champ you are at <span className='text-strong font-bold'>{sessionRemained.currentSection}</span> ace it</h2> */}
 
                 <div className="flex items-center mt-4">
-                  <div className="w-full h-3 bg-gray-300 rounded-full">
+                  <div className="sm:w-full w-[60%] h-3 bg-gray-300 rounded-full">
                     <div className="h-full bg-green-500 rounded-full" style={{ width: `${progress}%` }}></div>
                   </div>
                   <span className="ml-2 text-xs text-gray-500">{progress.toFixed(0)}% completed</span>
                 </div>
                 <p className="mt-2 text-sm text-gray-600">{personalizedMessage}</p>
-                <div className="flex items-center justify-center gap-7 mt-6">
-                  <Button className='w-36' >Resume Test</Button>
+                <div className="flex items-center justify-center sm:gap-7  mt-6">
+                  <Button className='w-28 sm:w-36 ' >Resume Test</Button>
                 </div>
               </div>
               <div className="text-center flex justify-end items-center">

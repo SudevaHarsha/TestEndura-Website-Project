@@ -64,7 +64,7 @@ const ReadingCompehension = ({ question, NextQuestion }) => {
 
     return (
         <div className="p-2 pt-4 sm:p-2 sm:pt-4 h-auto max-w-full sm:flex gap-4">
-            <div className="p-4 text-justify border rounded-2xl w-[50%]">
+            <div className="p-4 text-justify border rounded-2xl sm:w-[50%]">
                 <p>  {sentences.map((sentence, index) => (
                     <span key={index} className={`${sentence.includes(targetSentence) && question.highlighted === true ? "bg-strong text-white" : ""
                         } ${(selectedSentence === index || selectedChoices.includes(sentence)) && selectmode === true ? "underline" : ""}`} onClick={() => {
@@ -73,7 +73,7 @@ const ReadingCompehension = ({ question, NextQuestion }) => {
                         }}
                         style={{
                             textDecorationColor:
-                                result && correctAnswer?.includes(sentence) ? "green" : result && !correctAnswer?.includes(sentence) && selectedChoices.includes(sentence) ? "red" : "",
+                                result && correctAnswer?.includes(sentence) ? "green" : result && correctAnswer?.includes(sentence) && result && selectedChoices.includes(sentence) ? 'green' : result && !correctAnswer?.includes(sentence) && selectedChoices.includes(sentence) ? "red" : "",
                         }}
                     >
                         {sentence}
@@ -83,7 +83,7 @@ const ReadingCompehension = ({ question, NextQuestion }) => {
                     </span>
                 ))}</p>
             </div>
-            <div className="d-block sm:flex w-[50%] justify-between mt-5">
+            <div className="d-block sm:flex sm:w-[50%] justify-between mt-5">
                 {questionHasImage && (
                     <Image
                         width={200}

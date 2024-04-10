@@ -56,7 +56,7 @@ export async function POST(req, res) {
     const newProfile = await db.profile.create({
       data: {
         userId: newUser.id,
-        name: `${newUser.firstName} ${newUser.lastName}`,
+        name: `${firstName} ${lastName}`,
         imageUrl: newUser.imageUrl,
         email: newUser.emailAddresses[0].emailAddress,
         role: "student",

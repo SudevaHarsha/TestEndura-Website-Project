@@ -1,11 +1,13 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { finished } from "nodemailer/lib/xoauth2";
 
 export async function GET(req, { params }) {
   try {
         let InitialstudentSessions = await db.testSession.findMany({
       where: {
         profileId: params.studentId,
+        finished: true,
       },
       include: {
         test: {

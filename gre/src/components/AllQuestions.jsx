@@ -13,18 +13,23 @@ import axios from 'axios';
 import { useCurrentSession } from '@/providers/CurrentSessionContext';
 import testQuestions from '@/lib/test-questions';
 import DataInterpretationQuestions from './Questions/DataInterpretationQuestions';
+import ReviewQuestions from './Questions/ReviewQuestions';
+import QuestionsNav from './Questions/QuestionsNav';
+import ExitSection from './Questions/ExitSection';
+import HelpSection from './Questions/HelpSection';
 
-const AllQuestions = ({ questions, testSession, previousSectionsLengths }) => {
+const AllQuestions = ({ questions, testSession, test, previousSectionsLengths }) => {
 
   const router = useRouter();
 
-  const { currentQuestion, setCurrentQuestion, currentSection, setCurrentSection, nextQuestion, selectedChoices, setSelectedChoices, setPreviousLength, result } = useCurrentQuestion();
+  const { currentQuestion, setCurrentQuestion, currentSection, setCurrentSection, nextQuestion, selectedChoices, setSelectedChoices, setPreviousLength, result, review, exitSection, help, markQuestions, setMarkQuestions } = useCurrentQuestion();
   console.log("question", currentQuestion);
   const { currentSession, setCurrentSession } = useCurrentSession();
-  console.log(questions,questions.length);
+  console.log(questions, questions.length);
 
   const previousLength = previousSectionsLengths.reduce((sum, current) => sum + current, 0);
   setPreviousLength(previousLength);
+
 
   const currentDate = new Date();
   const handleNext = async () => {
@@ -53,6 +58,11 @@ const AllQuestions = ({ questions, testSession, previousSectionsLengths }) => {
       converteedAnswers = JsonToArray();
     }
     const updatedTestSession = handleUpdateTimes();
+
+    /* const sectionKeys = Object.keys(questions);
+    const currentIndex = sectionKeys.indexOf(currentSection);
+    setCurrentSection(sectionKeys[currentIndex + 1]);
+    console.log(currentSection); */
     console.log(updatedTestSession);
     router.push(`/timepause/${currentSession.id}`)
     setSelectedChoices([])
@@ -108,10 +118,11 @@ const AllQuestions = ({ questions, testSession, previousSectionsLengths }) => {
   const NextQuestion = () => {
     if (currentSection === currentSession.test.sections[currentSession.test.sections.length - 1] && currentQuestion === questions.length - 1) {
       console.log("entered");
-      setCurrentSection(currentSession.test.sections[0]);
-      setCurrentQuestion(0);
       handleSubmit();
       router.push("/submission")
+
+      setCurrentSection(currentSession.test.sections[0]);
+      setCurrentQuestion(0);
       return
     }
     currentQuestion < questions.length - 1 ? StoreQuestion() : handleNext()
@@ -120,10 +131,20 @@ const AllQuestions = ({ questions, testSession, previousSectionsLengths }) => {
   console.log(currentQuestion);
 
   return <>
+    <QuestionsNav questionLength={questions.length} testSession={testSession} test={test} handleNext={handleNext} NextQuestion={NextQuestion} />
     {questions.map((question, index) => {
       console.log(question, index)
       if (index === currentQuestion) {
         console.log(question.questionType.type);
+        if (review) {
+          return <ReviewQuestions key='review' questions={questions} />
+        }
+        if (exitSection) {
+          return <ExitSection key='exitSection' handleNext={handleNext} questionLength={questions.length} />
+        }
+        if (help) {
+          return <HelpSection key='help' questionLength={questions.length} />
+        }
         if (question.questionType.type === "MCQ") {
           console.log('MCQ');
           return <MCQ key={index} question={question} NextQuestion={NextQuestion} />;

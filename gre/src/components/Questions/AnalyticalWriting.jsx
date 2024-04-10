@@ -1,15 +1,27 @@
-// pages/analytical-writing.js
-
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from "@/components/ui/textarea"
 import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
 import { useCurrentSession } from '@/providers/CurrentSessionContext';
+import dynamic from 'next/dynamic';
 
-const AnalyticalWritingPage = ({ NextQuestion }) => {
+const JoditEditor = dynamic(() => import("jodit-react"), {
+  ssr: false,
+});
+
+const AnalyticalWritingPage = ({ NextQuestion, question }) => {
   const { setCurrentQuestion, setSelectedChoices, selectedChoices, previousLength, currentQuestion, currentSection, resume } = useCurrentQuestion();
   const { currentSession } = useCurrentSession();
+  const [essay, setEssay] = useState('');
+
+  const editor = useRef(null)
+
+  const contentFieldChanaged = (data) => {
+    setEssay(data);
+    setSelectedChoices([data]);
+    return false
+  }
   const handleSubmitEssay = (essay) => {
     // Handle submission logic here
     console.log('Submitted Essay:', essay);
@@ -27,45 +39,45 @@ const AnalyticalWritingPage = ({ NextQuestion }) => {
       if (resume) {
         console.log("entered", currentSession.sessionAnswers[previousLength + currentQuestion + 1]);
         setSelectedChoices(currentSession.sessionAnswers[previousLength + currentQuestion + 1]);
+        setEssay(currentSession.sessionAnswers[previousLength + currentQuestion + 1][0])
         return
       }
       setSelectedChoices(currentSession.sessionAnswers[previousLength + currentQuestion]);
-      console.log(currentSession.sessionAnswers[previousLength + currentQuestion])
+      setEssay(currentSession.sessionAnswers[previousLength + currentQuestion][0])
+      console.log(currentSession.sessionAnswers[previousLength + currentQuestion][0])
     }
   }, [currentSession, previousLength, currentQuestion, setSelectedChoices]);
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 w-full">
       <div className="flex flex-col items-center justify-center mx-auto">
-        <CardDescription className="w-[90%] text-justify">
-          <p>
+        <div className="w-[90%] text-justify">
+          <div>
             In this section, you will be presented with an essay prompt. Please read the prompt carefully and write
             your essay in the text box provided below.
-          </p>
-        </CardDescription>
+          </div>
+        </div>
 
-        <div className="flex flex-col items-center justify-center p-2 text-justify">
-          <CardDescription className="w-[90%]">
-            <p className='border-b-2 mb-2 pb-1'>
+        <div className="flex flex-col items-center justify-center p-2 text-justify w-full">
+          <div className="w-[90%]">
+            <div className='border-b-2 mb-2 pb-1'>
               <strong>Prompt:</strong> {currentSession.prompt}
-            </p>
-            <p>
-              <em>Argument:</em> The following appeared in a memo from the director of a large group of hospitals.
-              "In a controlled laboratory study of liquid hand soaps, a concentrated solution of extra strength
-              UltraClean hand soap produced a 40 percent greater reduction in harmful bacteria than did the liquid hand
-              soaps currently used in our hospitals. During our recent test of regular-strength UltraClean with doctors,
-              nurses, and visitors at our hospital in Worktown, the hospital reported significantly fewer cases of patient
-              infection (a 20 percent reduction) than did any of the other hospitals in our group. Therefore, to prevent
-              serious patient infections, we should supply UltraClean at all hand-washing stations throughout our
-              hospital system."
-            </p>
-          </CardDescription>
+            </div>
+            <div>
+              {question.prompt}
+            </div>
+          </div>
 
           <div className="mt-4 w-[90%] rounded-2xl">
-            <Textarea placeholder="Write your essay here..." rows={10} className="rounded-2xl h-[500px]" value={selectedChoices[0] || ""}
+            {/* <Textarea placeholder="Write your essay here..." rows={10} className="rounded-2xl h-[500px]" value={selectedChoices[0] || ""}
               onChange={(e) => {
                 setSelectedChoices([e.target.value]);
-              }} />
+              }} /> */}
+            <JoditEditor
+              ref={editor}
+              value={essay}
+              onChange={(newContent) => contentFieldChanaged(newContent)}
+            />
           </div>
 
           <div className="flex justify-end mt-4">

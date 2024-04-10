@@ -22,6 +22,10 @@ export async function PATCH(req, { params }) {
 
     // Calculate updated result marks
     const updatedMarks =  testSession?.essayMarks > 0 ? testSession?.resultMarks-testSession?.essayMarks+parseInt(essayMarks) : testSession?.resultMarks + parseInt(essayMarks);
+    let QuestionMarks = testSession.questionMarks;
+    QuestionMarks[0] = parseInt(essayMarks);
+    let updatedResults = testSession?.results;
+    updatedResults[0] = true;
 
     // Update test session with new result marks
     const resultSession = await db.testSession.update({
@@ -31,6 +35,8 @@ export async function PATCH(req, { params }) {
       data: {
         essayMarks: parseInt(essayMarks),
         resultMarks: updatedMarks,
+        questionMarks: QuestionMarks,
+        results :updatedResults
       },
     });
 

@@ -42,10 +42,10 @@ const NavElements = ({ profile }) => {
                 <Link href="/mock-tests">
                     <div className="text-[#0c0c0d] hover:bg-[#01b3ef]/80 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Mock-Tests</div>
                 </Link>
-                {!profile.role === 'teacher' && <Link href="/study">
+                {!profile?.role === 'teacher' && <Link href="/study">
                     <div className="text-[#0c0c0d] hover:bg-[#01b3ef]/80 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Study</div>
                 </Link>}
-                {profile.role === 'teacher' && <Link href="/admin/student-view">
+                {profile?.role === 'teacher' && <Link href="/admin/student-view">
                     <div className="text-[#0c0c0d] hover:bg-[#01b3ef]/80 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Student View</div>
                 </Link>}
                 <Link href="/mock-tests/results">

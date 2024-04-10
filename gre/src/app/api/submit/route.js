@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { data } from "autoprefixer";
 import { sendEmailToTeacher } from "@/lib/send-email";
 import questions from "@/data/Questions";
+import assessEssay from "@/lib/assessEssay";
 
 export async function POST(req, res) {
   const { sessionId } = await req.json();
@@ -100,11 +101,13 @@ export async function POST(req, res) {
     let questionMarks = [];
 
     console.log(testSession.sessionAnswers);
-    for (const [questionId, userAnswer] of Object.entries(
-      testSession.sessionAnswers
-    )) {
+
+    const entries = Object.entries(testSession.sessionAnswers);
+    for (let i = 0; i < entries.length; i++) {
+      const [questionId, userAnswer] = entries[i];
       const question = AllQuestions[questionId];
-      console.log(questionId, question);
+      const index = i;
+      console.log(questionId, question, i);
       if (!question) {
         return new NextResponse(500);
       }
@@ -122,7 +125,8 @@ export async function POST(req, res) {
             correctAnswer.sort(),
             marks,
             questionMarks,
-            resultMarks
+            resultMarks,
+            index
           );
       if (
         (question.blankType === "fraction" ||
@@ -135,13 +139,15 @@ export async function POST(req, res) {
         let isDenominator = userAnswer[1] === question?.denominator;
         console.log(isDenominator, isNumerator);
         isCorrect = isNumerator && isDenominator;
-        if (isNumerator && isDenominator) {
+        if (isCorrect) {
+          console.log("final");
           resultMarks += marks;
-          questionMarks.push(marks);
+          questionMarks[index] = marks;
         }
-        if (isNumerator || isDenominator) {
-          resultMarks += marks / 2;
-          questionMarks.push(marks / 2);
+        if (!isCorrect) {
+          console.log("final");
+          resultMarks += 0;
+          questionMarks[index] = 0;
         }
         console.log(questionMarks, resultMarks);
       }
@@ -157,12 +163,13 @@ export async function POST(req, res) {
         isCorrect = isNumeric && isUnits;
         if (isNumeric && isUnits) {
           resultMarks += marks;
-          questionMarks.push(marks);
+          questionMarks[index] = marks;
         }
-        if (isNumeric || isUnits) {
-          resultMarks += marks / 2;
-          questionMarks.push(marks / 2);
+        if (!isCorrect) {
+          resultMarks += 0;
+          questionMarks[index] = 0;
         }
+
         console.log(questionMarks, resultMarks);
       }
       if (
@@ -176,29 +183,52 @@ export async function POST(req, res) {
         isCorrect = isNumeric;
         if (isNumeric) {
           resultMarks += marks;
-          questionMarks.push(marks);
+          questionMarks[index] = marks;
         }
         console.log(questionMarks, resultMarks);
       }
       if (question?.select === true) {
-        console.log(userAnswer[0], question?.correctSentence);
+        console.log(
+          userAnswer[0],
+          question?.correctSentence.includes(userAnswer[0])
+        );
         const isSentence = question.correctSentence.includes(userAnswer[0]);
         console.log(isSentence);
         isCorrect = isSentence;
         if (isSentence) {
           resultMarks += marks;
-          questionMarks.push(marks);
+          questionMarks[index] = marks;
+          console.log(questionMarks);
+        } else {
+          questionMarks[index] = 0;
         }
         console.log(questionMarks, resultMarks);
       }
       if (question.questionType.type === "AnalyticalWriting") {
+        const assessment = await assessEssay(question.prompt, userAnswer[0]);
+
+        console.log(assessment);
+        questionMarks[index] = marks;
         console.log(questionMarks, resultMarks);
         await sendEmailToTeacher(userAnswer[0]);
+      }
+      if (
+        (correctAnswer.length === 0 || userAnswer.length === 0) &&
+        question.blankType === ""
+      ) {
+        console.log("default");
+        questionMarks[index] = 0;
       }
       results.push(isCorrect);
     }
 
-    console.log(results);
+    console.log(
+      results,
+      questionMarks.reduce(
+        (accumulator, currentValue) => accumulator + currentValue,
+        0
+      )
+    );
 
     const resultSession = await db.testSession.update({
       where: {
@@ -206,7 +236,10 @@ export async function POST(req, res) {
       },
       data: {
         results: results,
-        resultMarks: resultMarks,
+        resultMarks: questionMarks.reduce(
+          (accumulator, currentValue) => accumulator + currentValue,
+          0
+        ),
         questionMarks: questionMarks,
       },
     });
@@ -219,15 +252,23 @@ export async function POST(req, res) {
 }
 
 // Utility function to check if two arrays are equal
-function arraysEqual(arr1, arr2, marks, questionMarks, resultMarks) {
+function arraysEqual(arr1, arr2, marks, questionMarks, resultMarks, index) {
   let multipleChoiceMarks = 0;
+
+  if (arr1.length === 0 || arr2.length === 0) {
+    questionMarks[index] = 0;
+    return false;
+  }
 
   for (let i = 0; i < arr1.length; i++) {
     if (arr1[i] === arr2[i]) {
-      multipleChoiceMarks = marks / arr2.length;
+      multipleChoiceMarks = multipleChoiceMarks + marks / arr2.length;
+    } else {
+      questionMarks[index] = 0;
+      return false;
     }
   }
-  questionMarks.push(multipleChoiceMarks);
+  questionMarks[index] = multipleChoiceMarks;
   resultMarks = resultMarks + multipleChoiceMarks;
   console.log(questionMarks, resultMarks);
   return true;

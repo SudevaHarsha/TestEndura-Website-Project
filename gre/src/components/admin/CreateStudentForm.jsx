@@ -33,6 +33,23 @@ const CreateStudentForm = () => {
       if (response) {
         // Redirect to a success page or login page
         console.log(response.data.newUser);
+        setFormData({
+          email: '',
+          password: '',
+          firstName: '',
+          lastName: '',
+          rollNumber: '',
+          teacherEmailId: '',
+          address: '',
+          cityName: '',
+          country: '',
+          zipCode: 0,
+          phone: 0,
+          center: 'North Campus', // Default value for center
+          joiningDate: '',
+          expiryDate: '',
+          examDate: ''
+        })
       } else {
         // Handle error, maybe display a message to the user
         console.error('Failed to create user:', response.data.error);
@@ -60,7 +77,7 @@ const CreateStudentForm = () => {
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Email address"
                 onChange={handleChange}
               />
@@ -75,7 +92,7 @@ const CreateStudentForm = () => {
                 type="password"
                 autoComplete="new-password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
                 onChange={handleChange}
               />
@@ -224,6 +241,7 @@ const CreateStudentForm = () => {
                 name="joiningDate"
                 type="date"
                 autoComplete="off"
+                placeholder='joining date'
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 onChange={handleChange}
@@ -238,6 +256,7 @@ const CreateStudentForm = () => {
                 name="expiryDate"
                 type="date"
                 autoComplete="off"
+                placeholder='expiry date'
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 onChange={handleChange}
@@ -252,6 +271,7 @@ const CreateStudentForm = () => {
                 name="examDate"
                 type="date"
                 autoComplete="off"
+                placeholder='exam date'
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 onChange={handleChange}
@@ -265,7 +285,7 @@ const CreateStudentForm = () => {
                 id="center"
                 name="center"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 onChange={handleChange}
               >
                 <option value="North Campus">North Campus</option>

@@ -2,10 +2,11 @@ import SectionWiseQuestions from '@/components/Questions/SectionWiseQuestions'
 import { db } from '@/lib/db'
 import React from 'react'
 
-const page = async({sessionId}) => {
+const page = async(sessionId) => {
+  console.log(sessionId);
   const testSession = await db.testSession.findFirst({
     where: {
-      id: sessionId,
+      id: sessionId.params.sessionId,
     },
     include: {
       test: {
@@ -35,12 +36,17 @@ const page = async({sessionId}) => {
               questionType: true,
             }
           },
+          dataInterpretationQuestions: {
+            include: {
+              questionType: true,
+            },
+          },
         },
       },
     },
   });
 
-  console.log(testSession);
+  console.log(testSession,'hi');
 
   const questions = [
     ...testSession.test.Questions,
@@ -48,6 +54,7 @@ const page = async({sessionId}) => {
     ...testSession.test.readingComprehensionQuestions,
     ...testSession.test.multipleAnswerQuestions,
     ...testSession.test.multipleChoiceQuestions,
+    ...testSession.test.dataInterpretationQuestions,
   ];
 
   const sections = testSession.test.sections.reduce((acc, section) => {

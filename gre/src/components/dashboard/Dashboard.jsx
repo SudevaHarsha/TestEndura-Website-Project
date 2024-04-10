@@ -65,7 +65,7 @@ const Dashboard = ({ users }) => {
 
     return (
         <div className='flex w-full h-full'>
-            <SideNavbar users={users} setNavState={setNavState} />
+            <SideNavbar users={users} setNavState={setNavState} navState={navState} />
             {(navState === 'dashboard' || navState === 'users' || navState === 'tests' || navState === 'question types') && (
                 <DashboardTable users={users} setNavState={setNavState} navState={navState} setTypeId={setTypeId} setQuestionId={setQuestionId} setTestId={setTestId} />
             )}

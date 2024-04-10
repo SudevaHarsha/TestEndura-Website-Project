@@ -16,7 +16,7 @@ const Submission = () => {
         </CardHeader>
         <CardDescription>
           <p>Your test has been successfully submitted.</p>
-          <p>If you'd like to review your answers or retake the test, please click the button below:</p>
+          <p>If you&apos;d like to review your answers or retake the test, please click the button below:</p>
         </CardDescription>
       </Card>
 
@@ -24,7 +24,9 @@ const Submission = () => {
         <Link href="/">
           <Button variant="primary" className="flex justify-center items-center m-0">Return to Home</Button>
         </Link>
-        <Button className="h-11 text-white bg-strong hover:bg-strong/90 px-3 my-auto text-center mb-0" >View Results</Button>
+        <Link href='/mock-tests/results'>
+          <Button className="h-11 text-white bg-strong hover:bg-strong/90 px-3 my-auto text-center mb-0" >View Results</Button>
+        </Link>
       </div>
     </div>
   );

@@ -1,25 +1,29 @@
+'use client'
+
 import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
-const CreateTestForm = ({test}) => {
+const CreateTestForm = ({ test }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [numberOfSections, setNumberOfSections] = useState(0);
+  const [numberOfAttempts, setNumberOfAttempts] = useState(0);
   const [sections, setSections] = useState([]);
   const [durations, setDurations] = useState([]);
 
   const { edited } = useCurrentQuestion();
 
-  useEffect(()=>{
-    if(test && edited) {
+  useEffect(() => {
+    if (test && edited) {
       setName(test?.name);
       setDescription(test?.description);
       setDurations(test?.sectionDuration);
       setNumberOfSections(test?.sections?.length);
-      setSections(test?.sections)
+      setSections(test?.sections);
+      setNumberOfAttempts(test?.totalAttempts)
     }
-  },[edited,test])
+  }, [edited, test])
 
   const handleSectionChange = (index, value) => {
     const updatedSections = [...sections];
@@ -37,12 +41,13 @@ const CreateTestForm = ({test}) => {
     e.preventDefault();
     try {
       if (edited && test) {
-        const response = axios.patch(`/api/test/${test.id}`,{
+        const response = axios.patch(`/api/test/${test.id}`, {
           name: name,
           description: description,
           numberOfSections: numberOfSections,
           sections: sections,
-          durations: durations
+          durations: durations,
+          totalAttempts: numberOfAttempts
         });
         console.log("Question edited successfully: ", (await response).data.updatedTest);
         return
@@ -62,6 +67,8 @@ const CreateTestForm = ({test}) => {
     }
   };
 
+  const sectionNames = ['AnalyticalWriting','VerbalReasoning1','VerbalReasoning2','QuantativeReasoning1','QuantativeReasoning2']
+
   return (
     <div className='w-full h-full flex items-center'>
       <div className="w-full max-w-md mx-auto bg-white rounded-lg shadow-lg p-8">
@@ -76,6 +83,10 @@ const CreateTestForm = ({test}) => {
             <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} className="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"></textarea>
           </div>
           <div>
+            <label htmlFor="numberOfAttempts" className="block text-gray-700">Number of Attempts:</label>
+            <input type="number" id="numberOfAttempts" value={numberOfAttempts} onChange={(e) => setNumberOfAttempts(parseInt(e.target.value))} min="0" className="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" />
+          </div>
+          <div>
             <label htmlFor="numberOfSections" className="block text-gray-700">Number of Sections:</label>
             <input type="number" id="numberOfSections" value={numberOfSections} onChange={(e) => setNumberOfSections(parseInt(e.target.value))} min="0" className="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" />
           </div>
@@ -83,7 +94,20 @@ const CreateTestForm = ({test}) => {
             <div key={index} className="flex space-x-4">
               <div className="flex-grow">
                 <label htmlFor={`section-${index}`} className="block text-gray-700">{`Section ${index + 1}:`}</label>
-                <input type="text" id={`section-${index}`} value={sections[index] || ''} onChange={(e) => handleSectionChange(index, e.target.value)} className="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" />
+                {/* <input type="text" id={`section-${index}`} value={sections[index] || ''} onChange={(e) => handleSectionChange(index, e.target.value)} className="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" /> */}
+                <select
+                  name="testId"
+                  value={sections[index] || ''}
+                  onChange={(e) => handleSectionChange(index, e.target.value)}
+                  className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  <option value="">Select Test</option>
+                  {sectionNames && sectionNames?.map((section) => (
+                    <option key={section} value={section}>
+                      {section}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label htmlFor={`duration-${index}`} className="block text-gray-700">{`Duration:`}</label>

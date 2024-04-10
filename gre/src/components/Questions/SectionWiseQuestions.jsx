@@ -58,8 +58,7 @@ const SectionWiseQuestions = ({test,testSession,questions}) => {
 
     return (
         <>
-            <QuestionsNav questionLength={questions[currentSection].length} testSession={testSession} test={test}/>
-            <AllQuestions questions={questions[currentSection]} testSession={testSession} previousSectionsLengths={previousSectionsLengths}/>
+            <AllQuestions questions={questions[currentSection]} testSession={testSession} previousSectionsLengths={previousSectionsLengths} test={test}/>
             {/* <Timeout handleNextSection={handleNextSection} /> */}
         </>
     );

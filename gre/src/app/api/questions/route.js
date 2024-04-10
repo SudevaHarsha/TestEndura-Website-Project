@@ -7,6 +7,7 @@ export async function POST(req, res) {
   const {
     testId,
     typeId,
+    subject,
     questionText,
     prompt,
     numberOfOptions,
@@ -30,12 +31,15 @@ export async function POST(req, res) {
     correctNumeric,
     description,
     ImageUrl,
-    optionType
+    optionType,
+    marks,
+    question
   } = await req.json();
   try {
     console.log(
       testId,
       typeId,
+      subject,
       questionText,
       prompt,
       numberOfOptions,
@@ -58,12 +62,15 @@ export async function POST(req, res) {
       correctNumeric,
       description,
       ImageUrl,
-      optionType
+      optionType,
+      marks,
+      question
     );
     /*   const newQuestion = await db.question.create({
       data: {
         testId,
         typeId,
+        subject,
         questionText,
         options,
         option: parseInt(correctAnswer.length),
@@ -94,11 +101,13 @@ export async function POST(req, res) {
         data: {
           testId,
           typeId,
+          subject,
           questionText,
           correctAnswer,
           questionText,
           section,
           description,
+          marks:parseInt(marks),
           prompt,
         },
       });
@@ -115,6 +124,7 @@ export async function POST(req, res) {
         data: {
           testId,
           typeId,
+          subject,
           questionText,
           options,
           option: parseInt(correctAnswer.length),
@@ -124,6 +134,7 @@ export async function POST(req, res) {
           highlighted,
           section,
           description,
+          marks:parseInt(marks),
           paragraph,
           highlightedSentence,
         },
@@ -134,12 +145,14 @@ export async function POST(req, res) {
         data: {
           testId,
           typeId,
+          subject,
           questionText,
           options,
           correctAnswer,
           blankType,
           section,
           description,
+          marks:parseInt(marks),
           numberOfBlanks,
           blankOptions,
           numerator:parseInt(numerator),
@@ -154,17 +167,20 @@ export async function POST(req, res) {
         data: {
           testId,
           typeId,
+          subject,
           questionText,
           options,
           correctAnswer,
           optionType,
           section,
           description,
+          marks:parseInt(marks),
           images: ImageUrl,
           numerator:parseInt(numerator),
           denominator:parseInt(denominator),
           units,
-          correctNumeric: parseInt(correctNumeric)
+          correctNumeric: parseInt(correctNumeric),
+          question
         },
       });
     }
@@ -174,6 +190,7 @@ export async function POST(req, res) {
         data: {
           testId,
           typeId,
+          subject,
           questionText,
           options,
           option: parseInt(correctAnswer.length),
@@ -182,6 +199,7 @@ export async function POST(req, res) {
           section,
           ImageUrl : ImageUrl[0],
           description,
+          marks:parseInt(marks),
         },
       });
     }
@@ -193,12 +211,14 @@ export async function POST(req, res) {
         data: {
           testId,
           typeId,
+          subject,
           questionText,
           options,
           option: parseInt(correctAnswer.length),
           correctAnswer,
           section,
           description,
+          marks:parseInt(marks),
           Quantity1,
           Quantity2,
           image,

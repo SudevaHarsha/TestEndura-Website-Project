@@ -18,7 +18,7 @@ const Timeout = ({handleNextSection}) => {
             </CardHeader>
             <CardDescription>
               <p>Unfortunately, your time for the GRE mock test has expired.</p>
-              <p>If you'd like to try the test again, please click the button below:</p>
+              <p>If you&apos;d like to try the test again, please click the button below:</p>
             </CardDescription>
           </Card>
           <div className="mt-6">

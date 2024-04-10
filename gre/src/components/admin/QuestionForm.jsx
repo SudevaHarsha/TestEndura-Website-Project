@@ -5,9 +5,18 @@ import axios from 'axios';
 import Image from 'next/image';
 import { useCurrentQuestion } from '@/providers/CurrentQuestionContext';
 
+import dynamic from 'next/dynamic';
+
+const JoditEditor = dynamic(() => import("jodit-react"), {
+  ssr: false,
+});
+
 const CreateQuestionForm = ({ questionTypes, tests, question }) => {
+/*   const JoditEditor = dynamic(() => import('jodit-react'), { ssr: false });
+ */  const editor = useRef(null);
   const ref = useRef(null);
   const [urls, setUrls] = useState([]);
+  const subjects = ['Algebra', 'Verbal']
   const [formData, setFormData] = useState({
     testId: '',
     typeId: '',
@@ -36,15 +45,20 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
     correctNumeric: 0,
     noOfImages: 0,
     optionType: '',
+    marks: 0,
+    question: '',
+    subject: '',
   });
   const { edited } = useCurrentQuestion();
 
   useEffect(() => {
     if (edited && question) {
+      setUrls([question?.ImageUrl1, question?.ImageUrl2])
       setFormData({
         testId: question.testId || '',
         typeId: question.typeId || '',
         questionText: question?.questionText || '',
+        question: question?.question || '',
         prompt: question?.prompt || '',
         numberOfOptions: question?.options?.length || 0,
         options: question.options || [],
@@ -66,6 +80,9 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
         denominator: question.denominator || 0,
         units: question.units || '',
         correctNumeric: question.correctNumeric || 0,
+        marks: question.marks || 0,
+        optionType: question?.optionType || '',
+        ImageUrl: [question?.ImageUrl1, question?.ImageUrl2] || [],
       });
     }
   }, [question, edited])
@@ -117,6 +134,15 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
       [name]: newValue,
     }));
   };
+
+  const contentFieldChanaged = (data) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      'question': data,
+    }));
+  }
+
+
   const handleOptionChange = (e, index) => {
     const { value } = e.target;
     const updatedOptions = [...formData.options];
@@ -161,7 +187,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
                 type="text"
                 value={formData.blankOptions[blankIndex * 3 + optionIndex] || ''}
                 onChange={(e) => handleBlankOptionChange(e, blankIndex * 3 + optionIndex)}
-                className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
               />
               <label className="block mt-2">
                 <input
@@ -254,6 +280,9 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
         correctNumeric: 0,
         noOfImages: 0,
         optionType: '',
+        marks: 0,
+        question: '',
+        subject: '',
       });
     } catch (error) {
       console.error('Error creating question:', error);
@@ -261,7 +290,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
   };
 
   return (
-    <div className="mx-auto mt-8 p-4 bg-white shadow-md rounded-lg w-full">
+    <div className="mx-auto mt-8 p-4 bg-white shadow-md rounded-sm w-full">
       <h2 className="text-2xl font-bold mb-4">{edited ? "Edit" : "Create New"} Question</h2>
       <label className="block mb-4">
         Test:
@@ -269,7 +298,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           name="testId"
           value={formData.testId}
           onChange={handleChange}
-          className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
         >
           <option value="">Select Test</option>
           {tests && tests?.map((test) => (
@@ -279,29 +308,14 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           ))}
         </select>
       </label>
-      <label className="block mb-4">
-        Question Type:
-        <select
-          name="typeId"
-          value={formData.typeId}
-          onChange={handleChange}
-          className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-        >
-          <option value="">Select Question Type</option>
-          {questionTypes && questionTypes?.map((type) => (
-            <option key={type.id} value={type.id}>
-              {type.type}
-            </option>
-          ))}
-        </select>
-      </label>
+
       <label className="block mb-4">
         Section:
         <select
           name="section"
           value={formData.section}
           onChange={handleChange}
-          className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
         >
           <option value="">Select Section</option>
           {formData.testId &&
@@ -315,6 +329,40 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
         </select>
       </label>
 
+      <label className="block mb-4">
+        Question Type:
+        <select
+          name="typeId"
+          value={formData.typeId}
+          onChange={handleChange}
+          className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
+        >
+          <option value="">Select Question Type</option>
+          {questionTypes && questionTypes?.map((type) => (
+            <option key={type.id} value={type.id}>
+              {type.type}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="block mb-4">
+        Subject:
+        <select
+          name="subject"
+          value={formData.subject}
+          onChange={handleChange}
+          className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
+        >
+          <option value="">Select Subject</option>
+          {subjects && subjects?.map((subject) => (
+            <option key={subject} value={subject}>
+              {subject}
+            </option>
+          ))}
+        </select>
+      </label>
+
       {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'Reading Comprehension' && (
         <label className="block mb-4">
           Paragraph:
@@ -322,10 +370,11 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
             name="paragraph"
             value={formData.paragraph}
             onChange={handleChange}
-            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
           />
         </label>
       )}
+
       <label className="block mb-4">
         Question Text:
         <input
@@ -333,9 +382,20 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           name="questionText"
           value={formData.questionText}
           onChange={handleChange}
-          className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
         />
       </label>
+
+      {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'DataInterpretation' && (
+        <label className="block mb-4">
+          Question:
+          <JoditEditor
+            ref={editor}
+            value={formData.question}
+            onChange={(newContent) => contentFieldChanaged(newContent)}
+          />
+        </label>
+      )}
       {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'MultipleAnswerQuestion' && (
         <div className="mb-4">
           <label className="block mb-2 font-bold">Blank Type:</label>
@@ -343,7 +403,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
             name="blankType"
             value={formData.blankType}
             onChange={handleChange}
-            className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md"
+            className="w-full px-4 py-2 mb-4 border border-gray-300 rounded"
           >
             <option value="">Select Blank Type</option>
             <option value="normal">Normal</option>
@@ -362,7 +422,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
               name="numberOfBlanks"
               value={formData.numberOfBlanks}
               onChange={handleNumberOfBlanksChange}
-              className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
             />
           </label>
           {/* Render blank options inputs */}
@@ -376,7 +436,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
             name="optionType"
             value={formData.optionType}
             onChange={handleChange}
-            className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md"
+            className="w-full px-4 py-2 mb-4 border border-gray-300 rounded"
           >
             <option value="">Select Blank Type</option>
             <option value="normal">Normal</option>
@@ -386,24 +446,24 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           </select>
         </>
       )}
-      {!formData.select && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type != 'AnalyticalWriting' && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type != 'MultipleAnswerQuestion' && formData.optionType === 'normal' && <label className="block mb-4">
+      {!formData.select && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type != 'AnalyticalWriting' && questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type != 'MultipleAnswerQuestion' && (formData.optionType === '' ? true : formData?.optionType === 'normal') && <label className="block mb-4">
         Number of Options:
         <input
           type="number"
           name="numberOfOptions"
           value={formData.numberOfOptions}
           onChange={handleChange}
-          className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
         />
       </label>}
-      {!formData.blankType === "numeric units" && !formData.blankType === "numeric" && formData.select && <label className="block mb-4">
+      {(!formData.blankType === "numeric units" && !formData.blankType === "numeric") || formData.select && <label className="block mb-4">
         Correct Answer:
         <input
           type="text"
           name="correctSentence"
           value={formData.correctSentence}
           onChange={handleChange}
-          className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
         />
       </label>}
       {/* {Array.from({ length: formData.numberOfOptions }).map((_, index) => (
@@ -413,7 +473,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
             type="text"
             value={formData.options[index] || ''}
             onChange={(e) => handleOptionChange(e, index)}
-            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
       ))} */}
@@ -424,7 +484,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
             type="text"
             value={formData.options[index] || ''}
             onChange={(e) => handleOptionChange(e, index)}
-            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
           />
           <label className="block mt-2">
             <input
@@ -479,11 +539,11 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
             name="highlightedSentence"
             value={formData.highlightedSentence}
             onChange={handleChange}
-            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
           />
         </label>
       )}
-      {(questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'MCQ' || questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'Quantitative') || questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'DataInterpretation' && (
+      {(questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'MCQ' || questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'Quantitative' || questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'DataInterpretation') && (
         <div className="mb-4">
           <label className="block mb-2 font-bold">Image:</label>
           <input
@@ -500,25 +560,17 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
             <input type="file" name="files" ref={ref} multiple />
             <button
               type="submit"
-              className="px-2 py-1 rounded-md bg-violet-50 text-violet-500"
+              className="px-2 py-1 rounded bg-violet-50 text-violet-500"
             >
               Upload
             </button>
           </form>
           {/* display uploaded images */}
-          <div className="relative aspect-video max-h-[400px]">
-            {urls.map((url) => {
-              console.log(url);
-              return (
-                <Image
-                  key={url}
-                  src={url}
-                  alt={url}
-                  className="object-cover"
-                  fill
-                />
-              );
-            })}
+          <div className="relative">{console.log(urls)}
+            {
+              urls.map((url) => {
+                return <div key={url}>{url}</div>
+              })}
           </div>
         </>
       }
@@ -528,7 +580,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           <input type="file" name="files" ref={ref} multiple />
           <button
             type="submit"
-            className="px-2 py-1 rounded-md bg-violet-50 text-violet-500"
+            className="px-2 py-1 rounded bg-violet-50 text-violet-500"
           >
             Upload
           </button>
@@ -558,7 +610,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
               name="Quantity1"
               value={formData.Quantity1}
               onChange={handleChange}
-              className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
             />
           </label>
           <label className="block mb-4">
@@ -568,7 +620,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
               name="Quantity2"
               value={formData.Quantity2}
               onChange={handleChange}
-              className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
             />
           </label>
         </>
@@ -580,7 +632,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           name="correctAnswer"
           value={formData.correctAnswer}
           onChange={handleChange}
-          className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
         />
       </label> */}
       {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'AnalyticalWriting' && (
@@ -590,7 +642,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
             name="prompt" // Corrected to lowercase "prompt"
             value={formData.prompt}
             onChange={handleChange}
-            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
           />
         </label>
       )}
@@ -602,7 +654,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
             name="numerator"
             value={formData.numerator}
             onChange={handleChange}
-            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
       )}
@@ -614,7 +666,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
             name="denominator"
             value={formData.denominator}
             onChange={handleChange}
-            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
       )}
@@ -626,7 +678,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
             name="correctNumeric"
             value={formData.correctNumeric}
             onChange={handleChange}
-            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
       )}
@@ -638,11 +690,11 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
             name="units"
             value={formData.units}
             onChange={handleChange}
-            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
       )}
-      {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'DataInterpretation' && (
+      {/* {questionTypes.find((Qtype) => Qtype.id === formData.typeId)?.type === 'DataInterpretation' && (
         <label className="block mb-4">
           Number of Images:
           <input
@@ -650,10 +702,10 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
             name="noOfImages"
             value={formData.noOfImages}
             onChange={handleChange}
-            className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
           />
         </label>
-      )}
+      )} */}
 
       {/* {formData.noOfImages > 0 && Array.from({ length: formData.noOfImages }, () => 0).map((image, index) => (
         <div key={index}>
@@ -661,7 +713,7 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
             <input type="file" name="files" ref={ref} multiple />
             <button
               type="submit"
-              className="px-2 py-1 rounded-md bg-violet-50 text-violet-500"
+              className="px-2 py-1 rounded bg-violet-50 text-violet-500"
             >
               Upload
             </button>
@@ -687,12 +739,22 @@ const CreateQuestionForm = ({ questionTypes, tests, question }) => {
           name="description"
           value={formData.description}
           onChange={handleChange}
-          className="block w-full mt-1 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
+        />
+      </label>
+      <label className="block mb-4">
+        Marks:
+        <input
+          type="number"
+          name="marks"
+          value={formData.marks}
+          onChange={handleChange}
+          className="block w-full mt-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
         />
       </label>
       <button
         onClick={handleCreateQuestion}
-        className="block w-full py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+        className="block mx-auto py-2 px-4 bg-indigo-600 text-white rounded hover:bg-indigo-700"
       >
         {edited ? "Edit" : "Create"} Question
       </button>
